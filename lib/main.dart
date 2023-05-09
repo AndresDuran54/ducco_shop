@@ -1,6 +1,6 @@
+import 'package:ducco_shop/modules/auth/login/login.dart';
+import 'package:ducco_shop/modules/home/overview/overview.dart';
 import 'package:flutter/material.dart';
-
-import 'modules/auth/module.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +13,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ducco Shop',
-      initialRoute: '/',
+      initialRoute: '/home/overview',
       debugShowCheckedModeBanner: false,
-      routes: {'/': (BuildContext context) => const AuthModule()},
+      routes: {
+        /* 
+          AUTH
+        */
+        '/auth/login': (BuildContext context) => const LoginScreen(),
+        /*
+          HOME
+        */
+        '/home/overview': (BuildContext context) => const OverviewScreen(),
+      },
     );
   }
 }

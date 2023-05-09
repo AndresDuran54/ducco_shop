@@ -1,21 +1,18 @@
-import 'package:ducco_shop/modules/auth/login/login.dart';
+import 'package:ducco_shop/modules/home/overview/overview.dart';
 import 'package:flutter/material.dart';
 
-class AuthModule extends StatelessWidget {
-  const AuthModule({super.key});
+class HomeModule extends StatelessWidget {
+  const HomeModule({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      initialRoute: '/auth/login',
+      initialRoute: 'products',
       onGenerateRoute: (RouteSettings settings) {
         WidgetBuilder builder;
-        debugPrint('settings.name');
-        debugPrint(settings.name);
-        debugPrint('settings.name');
         switch (settings.name) {
-          case '/auth/login':
-            builder = (BuildContext context) => const LoginScreen();
+          case 'products':
+            builder = (BuildContext context) => const OverviewScreen();
             break;
           default:
             throw Exception('Invalid route: ${settings.name}');
