@@ -1,6 +1,8 @@
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:flutter/material.dart';
 
+import 'package:ducco_shop/widgets/products/module.dart';
+
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
 
@@ -9,165 +11,166 @@ class OverviewScreen extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: AppColors.gray50Color,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: _AppBarOverview(size: size),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            const Image(
+              image: AssetImage('assets/images/logo_only.png'),
+              width: 35,
+            ),
+            _InputSearchOverview(size: size)
+          ],
+        ),
         backgroundColor: AppColors.primary10Color,
       ),
-      body: Container(
-        padding: const EdgeInsets.all(15),
-        color: AppColors.gray50Color,
-        child: GridView.builder(
-            itemCount: 21,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 10,
-                mainAxisExtent: 300,
-                childAspectRatio: 20),
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) => _ProductOverview(
-                  size: size,
-                )),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: ListView(
+          children: <Widget>[
+            const SizedBox(
+              height: 10,
+            ),
+            _FlayersImages(size: size),
+            const SizedBox(
+              height: 10,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                'Los más comprados',
+                style: TextStyle(
+                  color: AppColors.primary30Color,
+                  fontFamily: 'Signika',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  height: 1,
+                ),
+                textAlign: TextAlign.start,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ListProducts(size: size),
+            const SizedBox(
+              height: 20,
+            ),
+            _FlayersImages(size: size),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: const _NavigationBarOverview(),
+    );
+  }
+}
+
+class _FlayersImages extends StatelessWidget {
+  const _FlayersImages({
+    Key? key,
+    required this.size,
+  }) : super(key: key);
+
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: (size.height - 20) * 0.25,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 4,
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: FadeInImage(
+                width: size.width - 20,
+                placeholderFit: BoxFit.cover,
+                placeholder: const AssetImage('assets/gifs/loading.gif'),
+                fit: BoxFit.cover,
+                image: const NetworkImage('https://i.imgur.com/k0smmXd.png')),
+          );
+        },
       ),
     );
   }
 }
 
-class _ProductOverview extends StatelessWidget {
-  const _ProductOverview({Key? key, required this.size}) : super(key: key);
+class ListProducts extends StatelessWidget {
+  const ListProducts({
+    Key? key,
+    required this.size,
+  }) : super(key: key);
 
   final Size size;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          color: AppColors.primary20Color,
-          borderRadius: BorderRadius.circular(10)),
-      padding: const EdgeInsets.all(10),
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              height: 180,
-              decoration: BoxDecoration(
-                  color: AppColors.primary10Color,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  SizedBox(
-                    width: size.width - 20,
-                    child: const Text(
-                      'Logitech',
-                      style: TextStyle(
-                        color: AppColors.gray90Color,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  SizedBox(
-                    width: size.width - 20,
-                    child: const Text(
-                      'Teclado mecánico alambrico con luces RGB',
-                      style: TextStyle(
-                          color: AppColors.gray90Color,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w200,
-                          fontSize: 12,
-                          height: 1.5),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  SizedBox(
-                    width: size.width - 20,
-                    child: const Text(
-                      'S/60.00',
-                      style: TextStyle(
-                          color: AppColors.gray80Color,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w300,
-                          fontSize: 15,
-                          height: 2),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                  MaterialButton(
-                    color: AppColors.secondary50Color,
-                    onPressed: (() => {}),
-                    child: const Text(
-                      'AGREGAR AL \n CARRITO',
-                      style: TextStyle(
-                        color: AppColors.gray80Color,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        height: 1,
-                      ),
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            child: Container(
-              width: size.width * 0.32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.gray40Color,
-                  width: 2,
-                ),
-              ),
-              child: ClipOval(
-                child: FadeInImage(
-                    placeholder: const AssetImage('assets/gifs/loading.gif'),
-                    width: size.width * 0.32,
-                    height: 130,
-                    fit: BoxFit.cover,
-                    image: const NetworkImage(
-                        'https://promart.vteximg.com.br/arquivos/ids/6571809-1000-1000/image-e141cd34a31b46738915da3046190205.jpg?v=638012766471300000')),
-              ),
-            ),
-          )
-        ],
-      ),
+      height: (300 * 3) + 15 * 2,
+      padding: const EdgeInsets.only(top: 0, left: 10, right: 10, bottom: 0),
+      child: GridView.builder(
+          itemCount: 6,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 10,
+              mainAxisExtent: 300,
+              childAspectRatio: 20),
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) => ProductCard(
+                size: size,
+              )),
     );
   }
 }
 
-class _AppBarOverview extends StatelessWidget {
-  const _AppBarOverview({Key? key, required this.size}) : super(key: key);
-
-  final Size size;
+class _NavigationBarOverview extends StatelessWidget {
+  const _NavigationBarOverview({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        const Image(
-          image: AssetImage('assets/images/logo_only.png'),
-          width: 35,
-        ),
-        _InputSearchOverview(size: size)
-      ],
-    );
+    return BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle:
+            const TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.w500),
+        unselectedLabelStyle:
+            const TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.w500),
+        unselectedItemColor: AppColors.gray50Color,
+        selectedItemColor: AppColors.secondary60Color,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        backgroundColor: AppColors.primary15Color,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: AppColors.gray40Color),
+            activeIcon: Icon(Icons.home, color: AppColors.secondary60Color),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.category, color: AppColors.gray40Color),
+              activeIcon:
+                  Icon(Icons.category, color: AppColors.secondary60Color),
+              label: 'Categorías'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart, color: AppColors.gray40Color),
+              activeIcon:
+                  Icon(Icons.shopping_cart, color: AppColors.secondary60Color),
+              label: 'Carrito'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle, color: AppColors.gray40Color),
+              activeIcon:
+                  Icon(Icons.account_circle, color: AppColors.secondary60Color),
+              label: 'Mi cuenta'),
+        ]);
   }
 }
 

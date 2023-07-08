@@ -157,7 +157,7 @@ class _InputUsernameLogin extends StatelessWidget {
             ),
             filled: true,
             fillColor: AppColors.gray80Color,
-            hintText: 'Usuario',
+            hintText: 'Usuarios',
             hintStyle: TextStyle(color: AppColors.gray50Color),
             border: OutlineInputBorder(
                 borderSide: BorderSide.none,
@@ -194,11 +194,11 @@ class _ButtonLogin extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      child: SizedBox(
+      child: const SizedBox(
         height: 50,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
+          children: <Widget>[
             Text(
               'INGRESAR',
               style: TextStyle(

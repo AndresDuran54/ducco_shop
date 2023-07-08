@@ -1,0 +1,1 @@
+export 'package:ducco_shop/modules/products/product_detail/organisms/product_detail.dart';
