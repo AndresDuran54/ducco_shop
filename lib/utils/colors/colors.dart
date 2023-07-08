@@ -5,6 +5,7 @@ class AppColors {
     PRIMARY COLOR
   */
   static const primary10Color = Color(0xFF0F141A);
+  static const primary15Color = Color(0xFF0A0F1A);
   static const primary20Color = Color(0xFF1F2833);
   static const primary30Color = Color(0xFF1D4A4D);
   static const primary40Color = Color(0xFF276366);
@@ -23,9 +24,13 @@ class AppColors {
   static const secondary60Color = Color(0xFF039906);
   static const secondary70Color = Color(0xFF20B356);
   static const secondary80Color = Color(0xFF25CC62);
+  static const secondary90Color = Color(0xFF29E66E);
+  static const secondary100Color = Color(0xFF2EFF7B);
   /*
     GRAY COLOR
   */
+  static const gray10Color = Color(0xFF181A19);
+  static const gray20Color = Color(0xFF303332);
   static const gray30Color = Color(0xFF494D4B);
   static const gray40Color = Color(0xFF616664);
   static const gray50Color = Color(0xFF7A807E);

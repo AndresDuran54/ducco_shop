@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ducco Shop',
-      initialRoute: '/home/overview',
+      initialRoute: '/auth/login',
       debugShowCheckedModeBanner: false,
       routes: {
         /* 
