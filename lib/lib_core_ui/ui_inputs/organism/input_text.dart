@@ -1,0 +1,120 @@
+import 'package:flutter/material.dart';
+
+//+ UTILS
+import 'package:ducco_shop/utils/colors/colors.dart';
+import 'package:ducco_shop/utils/fonts/fonts.dart';
+import 'package:flutter/services.dart';
+
+class CoreUIInputText extends StatefulWidget {
+  final String labelText;
+  final List<String? Function({required String value})> validators;
+  final TextInputType textInputType;
+
+  const CoreUIInputText(
+      {super.key,
+      required this.labelText,
+      this.validators = const [],
+      this.textInputType = TextInputType.text});
+
+  @override
+  State<CoreUIInputText> createState() => _CoreUIInputTextState();
+}
+
+class _CoreUIInputTextState extends State<CoreUIInputText> {
+  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
+  Color currentColor = AppColors.gray80Color;
+  String? errorText;
+
+  String? onCheckValidators(String? value) {
+    if (value == null) return value;
+    for (String? Function({required String value}) validatorFunc
+        in this.widget.validators) {
+      this.errorText = validatorFunc(value: value);
+      if (this.errorText != null) {
+        this.setState(() {
+          this.currentColor = AppColors.red100Color;
+        });
+      } else {
+        this.setState(() {
+          this.currentColor = AppColors.gray80Color;
+        });
+      }
+      if (this.errorText != null) return this.errorText;
+    }
+    return null;
+  }
+
+  onChanges(String? value) {
+    if (value == null) return;
+    for (String? Function({required String value}) validatorFunc
+        in this.widget.validators) {
+      this.errorText = validatorFunc(value: value);
+      if (this.errorText != null) {
+        this.setState(() {
+          this.currentColor = AppColors.red100Color;
+        });
+      } else {
+        this.setState(() {
+          this.currentColor = AppColors.gray80Color;
+        });
+      }
+      if (this.errorText != null) return this.errorText;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      key: formKey,
+      keyboardType: this.widget.textInputType,
+      inputFormatters: [
+        if (this.widget.textInputType == TextInputType.number)
+          FilteringTextInputFormatter.digitsOnly
+      ],
+      style: AppFonts.labelTextLight(
+          color: this.currentColor, fontFamily: 'Roboto'),
+      decoration: InputDecoration(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 1,
+            color: this.currentColor,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 2,
+            color: this.currentColor,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 2,
+            color: this.currentColor,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 2,
+            color: this.currentColor,
+          ),
+        ),
+        hintStyle: AppFonts.labelTextLight(
+            color: this.currentColor, fontFamily: 'Roboto'),
+        hoverColor: Colors.red,
+        floatingLabelStyle: AppFonts.labelTextLight(
+            color: this.currentColor, fontFamily: 'Roboto'),
+        labelStyle: AppFonts.labelTextLight(
+            color: this.currentColor, fontFamily: 'Roboto'),
+        errorStyle: AppFonts.captionTextLight(
+            color: this.currentColor, fontFamily: 'Roboto'),
+        labelText: this.widget.labelText,
+        errorText: this.errorText,
+      ),
+      validator: (String? value) {
+        return this.onCheckValidators(value);
+      },
+      onChanged: (String value) => {this.onChanges(value)},
+    );
+  }
+}

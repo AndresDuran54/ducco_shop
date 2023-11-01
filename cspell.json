@@ -6,8 +6,10 @@
   // words - list of words to be always considered correct
   "words": [
     "Braah",
+    "gifs",
     "poppins",
     "roboto",
+    "Setteamos",
     "signika"
   ],
   // flagWords - list of words to be always considered incorrect

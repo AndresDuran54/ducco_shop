@@ -21,6 +21,7 @@ class UiButtonMiniIcon extends StatelessWidget {
       onTap: () {
         // Acción a realizar cuando se toque el contenedor
         print('Contenedor clickeado!');
+        Navigator.pop(context, '');
       },
       child: Container(
         padding: EdgeInsets.all(4),

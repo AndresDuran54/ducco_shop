@@ -1,0 +1,1 @@
+export 'package:ducco_shop/lib_core_ui/ui_cards/products_cards/organism/products_card.dart';
