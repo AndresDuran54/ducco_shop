@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 class CoreUIInputText extends StatefulWidget {
   final String labelText;
+  final String defaultText;
   final List<String? Function({required String value})> validators;
   final TextInputType textInputType;
 
@@ -14,7 +15,8 @@ class CoreUIInputText extends StatefulWidget {
       {super.key,
       required this.labelText,
       this.validators = const [],
-      this.textInputType = TextInputType.text});
+      this.textInputType = TextInputType.text,
+      this.defaultText = ''});
 
   @override
   State<CoreUIInputText> createState() => _CoreUIInputTextState();
@@ -22,7 +24,7 @@ class CoreUIInputText extends StatefulWidget {
 
 class _CoreUIInputTextState extends State<CoreUIInputText> {
   final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
-  Color currentColor = AppColors.gray80Color;
+  Color currentColor = AppColors.gray40Color;
   String? errorText;
 
   String? onCheckValidators(String? value) {
@@ -36,7 +38,7 @@ class _CoreUIInputTextState extends State<CoreUIInputText> {
         });
       } else {
         this.setState(() {
-          this.currentColor = AppColors.gray80Color;
+          this.currentColor = AppColors.gray40Color;
         });
       }
       if (this.errorText != null) return this.errorText;
@@ -48,16 +50,14 @@ class _CoreUIInputTextState extends State<CoreUIInputText> {
     if (value == null) return;
     for (String? Function({required String value}) validatorFunc
         in this.widget.validators) {
-      this.errorText = validatorFunc(value: value);
-      if (this.errorText != null) {
-        this.setState(() {
+      this.setState(() {
+        this.errorText = validatorFunc(value: value);
+        if (this.errorText != null) {
           this.currentColor = AppColors.red100Color;
-        });
-      } else {
-        this.setState(() {
-          this.currentColor = AppColors.gray80Color;
-        });
-      }
+        } else {
+          this.currentColor = AppColors.gray40Color;
+        }
+      });
       if (this.errorText != null) return this.errorText;
     }
     return null;
@@ -67,6 +67,7 @@ class _CoreUIInputTextState extends State<CoreUIInputText> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: formKey,
+      initialValue: this.widget.defaultText,
       keyboardType: this.widget.textInputType,
       inputFormatters: [
         if (this.widget.textInputType == TextInputType.number)

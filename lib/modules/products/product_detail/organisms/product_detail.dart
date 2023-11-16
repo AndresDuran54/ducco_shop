@@ -1,3 +1,4 @@
+import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:flutter/material.dart';
 
 //+ COLORS
@@ -21,25 +22,8 @@ class ProductDetailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Column(
             children: [
-              //+ BUTTONS
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  UiButtonMiniIcon(
-                    iconData: Icons.arrow_back_sharp,
-                    color: AppColors.primary20Color,
-                    backgroundColor: AppColors.gray60Color,
-                  ),
-                  Image(
-                      image: AssetImage('assets/images/logo_ducco_name.png'),
-                      height: 30),
-                  UiButtonMiniIcon(
-                    iconData: Icons.favorite,
-                    color: AppColors.secondary60Color,
-                    backgroundColor: AppColors.gray60Color,
-                  )
-                ],
-              ),
+              //+ APP BAR
+              const ProductDetailScreenAppBar(),
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
@@ -68,7 +52,8 @@ class ProductDetailScreen extends StatelessWidget {
                     const ClipOval(
                       child: FadeInImage(
                           height: 280,
-                          placeholder: AssetImage('assets/gifs/loading_rolling.gif'),
+                          placeholder:
+                              AssetImage('assets/gifs/loading_rolling.gif'),
                           image: NetworkImage('https://imgur.com/2yM2vNt.png')),
                     ),
                     //+ PRECIO Y TOTAL
@@ -77,12 +62,10 @@ class ProductDetailScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const Text('S/ 150.00',
-                              style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 28,
-                                  color: AppColors.primary50Color)),
+                          Text('S/ 150.00',
+                              style: AppFonts.titleHeavy(
+                                  color: AppColors.secondary50Color,
+                                  fontFamily: 'Ubuntu')),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             decoration: BoxDecoration(
@@ -148,14 +131,11 @@ class ProductDetailScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
-                            'Clientes que vieron este producto tambien vieron',
+                        Text('Clientes que vieron este producto también vieron',
                             textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontFamily: 'Signika',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                color: AppColors.gray20Color)),
+                            style: AppFonts.labelTextHeavy(
+                                color: AppColors.gray25Color,
+                                fontFamily: 'Ubuntu')),
                         const SizedBox(
                           height: 12,
                         ),
@@ -164,7 +144,7 @@ class ProductDetailScreen extends StatelessWidget {
                           child: ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               separatorBuilder: (context, index) =>
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 16),
                               scrollDirection: Axis.horizontal,
                               itemCount: 5,
                               itemBuilder: (BuildContext context, int index) {
@@ -199,6 +179,35 @@ class ProductDetailScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ProductDetailScreenAppBar extends StatelessWidget {
+  const ProductDetailScreenAppBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        UIButtonMiniIcon(
+          iconData: Icons.arrow_back_sharp,
+          color: AppColors.primary20Color,
+          backgroundColor: AppColors.gray60Color,
+          onTapFunction: () => {Navigator.pop(context)},
+        ),
+        const Image(
+            image: AssetImage('assets/images/logo_ducco_name.png'), height: 30),
+        UIButtonMiniIcon(
+          iconData: Icons.favorite,
+          color: AppColors.secondary60Color,
+          backgroundColor: AppColors.gray60Color,
+          onTapFunction: () => {},
+        )
+      ],
     );
   }
 }

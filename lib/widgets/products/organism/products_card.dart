@@ -1,5 +1,12 @@
-import 'package:ducco_shop/utils/colors/colors.dart';
+//+ FLUTTER
 import 'package:flutter/material.dart';
+
+//+ UTILS
+import 'package:ducco_shop/utils/colors/colors.dart';
+import 'package:ducco_shop/utils/fonts/fonts.dart';
+
+//+ LIB CORE UI
+import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({Key? key, required this.size}) : super(key: key);
@@ -10,7 +17,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.primary20Color,
+          color: AppColors.gray70Color,
           borderRadius: BorderRadius.circular(10)),
       padding: const EdgeInsets.all(10),
       child: Stack(
@@ -24,7 +31,7 @@ class ProductCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               height: 180,
               decoration: BoxDecoration(
-                  color: AppColors.primary10Color,
+                  color: AppColors.gray50Color,
                   borderRadius: BorderRadius.circular(10)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,32 +67,23 @@ class ProductCard extends StatelessWidget {
                   ),
                   SizedBox(
                     width: size.width - 20,
-                    child: const Text(
+                    child: Text(
                       'S/60.00',
-                      style: TextStyle(
-                          color: AppColors.gray80Color,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w300,
-                          fontSize: 15,
-                          height: 1.2),
+                      style: AppFonts.mainTextHeavy(
+                          color: AppColors.black100Color, fontFamily: 'Ubuntu'),
                       textAlign: TextAlign.start,
                     ),
                   ),
-                  MaterialButton(
-                    color: AppColors.secondary50Color,
-                    onPressed: (() => {}),
-                    child: const Text(
-                      'AGREGAR AL CARRITO',
-                      style: TextStyle(
-                        color: AppColors.gray80Color,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        height: 1,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
+                  UIButtonIcon(
+                      height: 30,
+                      onPressedFunc: () {},
+                      enabledColor: AppColors.secondary60Color,
+                      disabledColor: AppColors.secondary40Color,
+                      splashColor: AppColors.gray100Color,
+                      iconData: Icons.shopping_cart,
+                      textStyle: AppFonts.mainTextHeavy(
+                          color: AppColors.black100Color, fontFamily: 'Ubuntu'),
+                      text: 'AGREGAR')
                 ],
               ),
             ),

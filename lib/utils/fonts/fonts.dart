@@ -4,6 +4,27 @@ class AppFonts {
   /*
     Title Style
   */
+  static TextStyle bigTitleLight(
+      {required Color color, required String fontFamily}) {
+    return TextStyle(
+        color: color,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w300,
+        fontSize: 38);
+  }
+
+  static TextStyle bigTitleHeavy(
+      {required Color color, required String fontFamily}) {
+    return TextStyle(
+        color: color,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w700,
+        fontSize: 38);
+  }
+
+  /*
+    Title Style
+  */
   static TextStyle titleLight(
       {required Color color, required String fontFamily}) {
     return TextStyle(
@@ -31,10 +52,31 @@ class AppFonts {
         color: color,
         fontFamily: fontFamily,
         fontWeight: FontWeight.w400,
-        fontSize: 18);
+        fontSize: 22);
   }
 
   static TextStyle subTitleHeavy(
+      {required Color color, required String fontFamily}) {
+    return TextStyle(
+        color: color,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w700,
+        fontSize: 22);
+  }
+
+  /*
+    SubTitle Style
+  */
+  static TextStyle subTitle2Light(
+      {required Color color, required String fontFamily}) {
+    return TextStyle(
+        color: color,
+        fontFamily: fontFamily,
+        fontWeight: FontWeight.w400,
+        fontSize: 18);
+  }
+
+  static TextStyle subTitle2Heavy(
       {required Color color, required String fontFamily}) {
     return TextStyle(
         color: color,
@@ -94,7 +136,7 @@ class AppFonts {
         color: color,
         fontFamily: fontFamily,
         fontWeight: FontWeight.w400,
-        fontSize: 14);
+        fontSize: 18);
   }
 
   static TextStyle buttonTextHeavy(
@@ -103,7 +145,7 @@ class AppFonts {
         color: color,
         fontFamily: fontFamily,
         fontWeight: FontWeight.w500,
-        fontSize: 14);
+        fontSize: 18);
   }
 
   /*

@@ -5,25 +5,32 @@ import 'package:flutter/material.dart';
 class CoreUIInputSelect extends StatelessWidget {
   final List<DropdownMenuItem<String>> optionsList;
   final String value;
+  final String labelText;
 
   const CoreUIInputSelect(
-      {super.key, required this.optionsList, required this.value});
+      {super.key,
+      required this.optionsList,
+      required this.value,
+      this.labelText = ''});
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      iconEnabledColor: AppColors.gray70Color,
-      decoration: const InputDecoration(
-        enabledBorder: OutlineInputBorder(
+      iconEnabledColor: AppColors.gray40Color,
+      decoration: InputDecoration(
+        labelText: this.labelText,
+        labelStyle: AppFonts.labelTextLight(
+            color: AppColors.gray40Color, fontFamily: 'Roboto'),
+        enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(
               width: 1,
               color: AppColors
-                  .gray80Color), // Estilo de la línea cuando no está seleccionado
+                  .gray40Color), // Estilo de la línea cuando no está seleccionado
         ),
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
             width: 2,
-            color: AppColors.gray80Color,
+            color: AppColors.gray40Color,
           ), // Estilo de la línea cuando no está seleccionado
         ),
       ),
@@ -31,7 +38,7 @@ class CoreUIInputSelect extends StatelessWidget {
       onChanged: (String? value) => {},
       items: this.optionsList,
       style: AppFonts.labelTextLight(
-          color: AppColors.gray70Color, fontFamily: 'Roboto'),
+          color: AppColors.gray40Color, fontFamily: 'Roboto'),
       icon: const Icon(Icons.keyboard_arrow_down),
       value: this.value,
     );

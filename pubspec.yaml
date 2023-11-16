@@ -91,6 +91,16 @@ flutter:
           weight: 400
         - asset: assets/fonts/roboto/Roboto-Thin.ttf
           weight: 300
+    - family: Ubuntu
+      fonts:
+        - asset: assets/fonts/ubuntu/Ubuntu-Bold.ttf
+          weight: 600
+        - asset: assets/fonts/ubuntu/Ubuntu-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/ubuntu/Ubuntu-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/ubuntu/Ubuntu-Light.ttf
+          weight: 300
     - family: Poppins
       fonts:
         - asset: assets/fonts/poppins/Poppins-Regular.ttf

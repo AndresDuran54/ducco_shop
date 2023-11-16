@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-//+ Utils
+//+ UTILS
 import 'package:ducco_shop/utils/colors/colors.dart';
 
-//+ Overview Screens
+//+ LIB CORE SDKS
+import 'package:ducco_shop/lib_core_sdks/providers/module.dart';
+
+//+ OVERVIEW SCREENS
 import 'package:ducco_shop/modules/home/overview.dart';
 import 'package:ducco_shop/modules/categories/overview.dart';
 import 'package:ducco_shop/modules/shopping_cart/overview.dart';
@@ -20,7 +23,7 @@ class Overview extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (BuildContext context) => new NavigationModel(),
       child: Scaffold(
-        backgroundColor: AppColors.gray50Color,
+        backgroundColor: AppColors.primary10Color,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Row(
@@ -33,7 +36,7 @@ class Overview extends StatelessWidget {
               InputSearchOverview(size: size)
             ],
           ),
-          backgroundColor: AppColors.primary10Color,
+          backgroundColor: AppColors.gray15Color,
         ),
         body: const BodyOverview(),
         bottomNavigationBar: const NavigationBarOverview(),
@@ -51,15 +54,17 @@ class BodyOverview extends StatelessWidget {
     //+ Inyectamos el navigationModel
     final navigationModel = Provider.of<NavigationModel>(context);
 
-    return PageView(
-      controller: navigationModel.pageController,
-      physics: const BouncingScrollPhysics(),
-      children: const <Widget>[
-        HomeOverview(),
-        CategoriesOverview(),
-        ShoppingCartOverview(),
-        AccountOverview()
-      ],
+    return Container(
+      decoration: const BoxDecoration(color: AppColors.gray80Color),
+      child: PageView(
+        controller: navigationModel.pageController,
+        children: const <Widget>[
+          HomeOverview(),
+          CategoriesOverview(),
+          ShoppingCartOverview(),
+          AccountOverview()
+        ],
+      ),
     );
   }
 }
@@ -87,7 +92,7 @@ class NavigationBarOverview extends StatelessWidget {
         selectedItemColor: AppColors.secondary60Color,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        backgroundColor: AppColors.primary15Color,
+        backgroundColor: AppColors.gray15Color,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home, color: AppColors.gray40Color),
@@ -111,46 +116,6 @@ class NavigationBarOverview extends StatelessWidget {
               label: 'Mi cuenta'),
         ]);
   }
-}
-
-//+ Navigation Model | Scaffold
-class NavigationModel with ChangeNotifier {
-  //+ Controlador del bottomNavigationBar
-  final PageController _pageController = new PageController();
-  //+ Indice de la página actual
-  int _actualPage = 0;
-
-  NavigationModel() {
-    //+ Agregamos un listener para el cambio de página
-    this._pageController.addListener(() {
-      //+ Obtenemos el indice de la página actual
-      int newPage = _pageController.page?.round() ?? 0;
-      //+ Verificamos si se cambio de página
-      if (this._actualPage != newPage) {
-        //+ Setteamos _actualPage
-        this._actualPage = newPage;
-        //+ Notificamos a los oyentes
-        this.notifyListeners();
-      }
-    });
-  }
-
-  //+ Getter _actualPage
-  int get actualPage => this._actualPage;
-
-  //+ Setter _actualPage
-  set actualPage(int actualPage) {
-    //+ Setteamos _actualPage
-    this._actualPage = actualPage;
-    //+ Cambiamos de página
-    this._pageController.animateToPage(this._actualPage,
-        duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
-    //+ Notificamos a los oyentes
-    this.notifyListeners();
-  }
-
-  //+ Getter _pageController
-  PageController get pageController => this._pageController;
 }
 
 class InputSearchOverview extends StatelessWidget {
