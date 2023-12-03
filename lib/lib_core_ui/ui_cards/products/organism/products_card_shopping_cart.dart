@@ -41,7 +41,7 @@ class ProductCardShopCart extends StatelessWidget {
             height: 100,
             child: Container(
               decoration: const BoxDecoration(
-                  color: AppColors.gray70Color,
+                  color: AppColors.gray50Color,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(6),
                       bottomRight: Radius.circular(200))),
@@ -54,7 +54,7 @@ class ProductCardShopCart extends StatelessWidget {
             height: 60,
             child: Container(
               decoration: const BoxDecoration(
-                  color: AppColors.gray70Color,
+                  color: AppColors.gray50Color,
                   borderRadius: BorderRadius.only(
                       bottomRight: Radius.circular(12),
                       topLeft: Radius.circular(200))),

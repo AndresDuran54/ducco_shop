@@ -1,10 +1,11 @@
-import 'package:ducco_shop/utils/fonts/fonts.dart';
+//+ FLUTTER
 import 'package:flutter/material.dart';
 
-//+ Utils
+//+ UTILS
 import 'package:ducco_shop/utils/colors/colors.dart';
+import 'package:ducco_shop/utils/fonts/fonts.dart';
 
-//+ Modules
+//+ MODULES
 import 'package:ducco_shop/widgets/products/module.dart';
 
 class HomeOverview extends StatelessWidget {

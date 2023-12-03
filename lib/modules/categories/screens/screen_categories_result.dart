@@ -1,7 +1,16 @@
+//+ FLUTTER
+import 'package:flutter/material.dart';
+
+//+ UTILS
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
+
+//+ MODULES
 import 'package:ducco_shop/widgets/products/module.dart';
-import 'package:flutter/material.dart';
+
+//+ LIB CORE UI
+import 'package:ducco_shop/lib_core_ui/ui_accordion/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 
 class ScreenCategoriesResult extends StatelessWidget {
   const ScreenCategoriesResult({super.key});
@@ -9,28 +18,135 @@ class ScreenCategoriesResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ListView(
         children: <Widget>[
-          const ScreenCategoriesResultFilters(),
           const SizedBox(
             height: 15,
           ),
-          SizedBox(
-            height: (300 * 2) + 15,
-            child: GridView.builder(
+          const ScreenCategoriesResultHeader(),
+          const SizedBox(
+            height: 15,
+          ),
+          ScreenCategoriesResultBody(size: size),
+          const SizedBox(
+            height: 15,
+          ),
+          ScreenCategoriesResultPaginator(size: size)
+        ],
+      ),
+    );
+  }
+}
+
+class ScreenCategoriesResultPaginator extends StatefulWidget {
+  const ScreenCategoriesResultPaginator({
+    super.key,
+    required this.size,
+  });
+
+  final Size size;
+
+  @override
+  State<ScreenCategoriesResultPaginator> createState() =>
+      _ScreenCategoriesResultPaginatorState();
+}
+
+class _ScreenCategoriesResultPaginatorState
+    extends State<ScreenCategoriesResultPaginator> {
+  final ScrollController _controller = ScrollController();
+  int currentIndex = 1;
+  int itemCount = 7;
+  late double itemWidth;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.itemWidth =
+        (widget.size.width / 2) / (this.itemCount > 3 ? 3 : this.itemCount);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      width: widget.size.width / 1.2,
+      decoration: BoxDecoration(
+          color: AppColors.gray30Color, borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => {
+              this.setState(() {
+                this.currentIndex =
+                    this.currentIndex - 1 < 1 ? 1 : this.currentIndex - 1;
+                if (this.currentIndex > 2) {
+                  this._controller.animateTo(
+                      this._controller.offset - this.itemWidth,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut);
+                }
+              })
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text('Anterior',
+                  style: AppFonts.labelTextHeavy(
+                      color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
+            ),
+          ),
+          Container(
+            width: widget.size.width / 2,
+            decoration: const BoxDecoration(color: AppColors.gray25Color),
+            child: ListView.builder(
+                controller: _controller,
+                itemCount: itemCount,
                 physics: const BouncingScrollPhysics(),
-                itemCount: 16,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 10,
-                    mainAxisExtent: 300,
-                    childAspectRatio: 20),
-                itemBuilder: (BuildContext context, int index) =>
-                    ProductCard(size: size)),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int i) => GestureDetector(
+                      onTap: () => {
+                        this.setState(() {
+                          this.currentIndex = i + 1;
+                        })
+                      },
+                      child: Container(
+                        width: this.itemWidth,
+                        decoration: BoxDecoration(
+                            color: currentIndex == (i + 1)
+                                ? AppColors.gray20Color
+                                : AppColors.gray35Color),
+                        child: Center(
+                          child: Text('${i + 1}',
+                              style: AppFonts.titleHeavy(
+                                  color: AppColors.gray100Color,
+                                  fontFamily: 'Ubuntu')),
+                        ),
+                      ),
+                    )),
+          ),
+          GestureDetector(
+            onTap: () => {
+              this.setState(() {
+                this.currentIndex = this.currentIndex + 1 > this.itemCount
+                    ? this.itemCount
+                    : this.currentIndex + 1;
+                if (this.currentIndex > 3) {
+                  this._controller.animateTo(
+                      this._controller.offset + this.itemWidth,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut);
+                }
+              })
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text('Siguiente',
+                  style: AppFonts.labelTextHeavy(
+                      color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
+            ),
           )
         ],
       ),
@@ -38,8 +154,37 @@ class ScreenCategoriesResult extends StatelessWidget {
   }
 }
 
-class ScreenCategoriesResultFilters extends StatelessWidget {
-  const ScreenCategoriesResultFilters({
+class ScreenCategoriesResultBody extends StatelessWidget {
+  final int itemCount = 5;
+
+  const ScreenCategoriesResultBody({
+    super.key,
+    required this.size,
+  });
+
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height:
+          ((itemCount / 2).ceil()) * 300 + ((itemCount / 2).ceil() - 1) * 15,
+      child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: itemCount,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              mainAxisExtent: 300),
+          itemBuilder: (BuildContext context, int index) =>
+              ProductCard(size: size)),
+    );
+  }
+}
+
+class ScreenCategoriesResultHeader extends StatelessWidget {
+  const ScreenCategoriesResultHeader({
     super.key,
   });
 
@@ -47,7 +192,7 @@ class ScreenCategoriesResultFilters extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.black40Color,
+          color: AppColors.black30Color,
           border: Border.all(width: 1, color: AppColors.gray10Color)),
       child: Column(
         children: <Widget>[
@@ -59,12 +204,12 @@ class ScreenCategoriesResultFilters extends StatelessWidget {
                 Text(
                   'Celulares y Teléfonos',
                   style: AppFonts.labelTextLight(
-                      color: AppColors.gray25Color, fontFamily: 'Ubuntu'),
+                      color: AppColors.gray85Color, fontFamily: 'Ubuntu'),
                 ),
                 Text(
                   'Resultados (5588)',
                   style: AppFonts.mainTextHeavy(
-                      color: AppColors.gray25Color, fontFamily: 'Ubuntu'),
+                      color: AppColors.gray85Color, fontFamily: 'Ubuntu'),
                 )
               ],
             ),
@@ -78,27 +223,65 @@ class ScreenCategoriesResultFilters extends StatelessWidget {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      const Icon(Icons.filter_list),
-                      Text(
-                        'Filtrar',
-                        style: AppFonts.labelTextHeavy(
-                            color: AppColors.gray100Color,
-                            fontFamily: 'Ubuntu'),
-                      )
-                    ],
+                  GestureDetector(
+                    onTap: () => {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              SingleChildScrollView(
+                                  child: UIAccordion(
+                                onPressedFunc: () => {Navigator.pop(context)},
+                              )))
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(Icons.filter_list),
+                        Text(
+                          'Filtrar',
+                          style: AppFonts.labelTextHeavy(
+                              color: AppColors.gray100Color,
+                              fontFamily: 'Ubuntu'),
+                        )
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: <Widget>[
-                      const Icon(Icons.sort),
-                      Text(
-                        'Ordenar',
-                        style: AppFonts.labelTextHeavy(
-                            color: AppColors.gray100Color,
-                            fontFamily: 'Ubuntu'),
-                      )
-                    ],
+                  GestureDetector(
+                    onTap: () => {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              SingleChildScrollView(
+                                  child: CoreUIInputSelectToggle(
+                                optionsList: const [
+                                  InputSelectToggle(
+                                      id: '1', label: 'Precio, mayor a menor'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Precio, menos a mayor'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Relevancia'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Más reciente'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Nombre, creciente'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Nombre, decreciente'),
+                                  InputSelectToggle(
+                                      id: '1', label: 'Descuento'),
+                                ],
+                                onPressedFunc: () => {Navigator.pop(context)},
+                              )))
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(Icons.sort),
+                        Text(
+                          'Ordenar',
+                          style: AppFonts.labelTextHeavy(
+                              color: AppColors.gray100Color,
+                              fontFamily: 'Ubuntu'),
+                        )
+                      ],
+                    ),
                   )
                 ]),
           )
