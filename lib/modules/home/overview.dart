@@ -1,4 +1,5 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:flutter/material.dart';
 
 //+ UTILS
@@ -52,7 +53,19 @@ class BodyHomeOverview extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          HomeOverviewListProducts(size: size),
+          // BlocBuilder<ProductsBloc, ProductsState>(
+          //     builder: (BuildContext context, ProductsState state) {
+          //   if (state.error) {
+          //     return const Text('STATE ERROR');
+          //   } else if (state.loading) {
+          //     return const Text('STATE LOADING');
+          //   } else if (state.success) {
+          //     return HomeOverviewListProducts(
+          //         size: size, products: state.products);
+          //   }
+          //   return const Text('STATE DEFAULT');
+          // }),
+          FutureHomeOverviewListProducts(size: size),
           const SizedBox(
             height: 10,
           ),
@@ -68,10 +81,44 @@ class BodyHomeOverview extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          HomeOverviewListProductsHorizontal(size: size)
+          FutureHomeOverviewListProductsHorizontal(size: size)
         ],
       ),
     );
+  }
+}
+
+class FutureHomeOverviewListProducts extends StatelessWidget {
+  final Size size;
+
+  const FutureHomeOverviewListProducts({required this.size, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<ProductsGetItems>(
+        future: ProductsDomainService.productsDomainService
+            .productsGetItems(headers: {
+          'paging_index': '1',
+          'paging_size': '4',
+          'orders': '[{"order":"inventorySalesQuantity","val":"desc"}]',
+        }),
+        builder:
+            (BuildContext context, AsyncSnapshot<ProductsGetItems> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: AppColors.primary30Color,
+              )),
+            );
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            return HomeOverviewListProducts(
+                size: size, products: snapshot.data!.items);
+          }
+          return const Text('DEFAULT');
+        });
   }
 }
 
@@ -79,8 +126,10 @@ class HomeOverviewListProducts extends StatelessWidget {
   const HomeOverviewListProducts({
     Key? key,
     required this.size,
+    required this.products,
   }) : super(key: key);
 
+  final List<Product> products;
   final Size size;
 
   @override
@@ -89,7 +138,7 @@ class HomeOverviewListProducts extends StatelessWidget {
       height: (300 * 2) + 15,
       padding: const EdgeInsets.only(top: 0, left: 10, right: 10, bottom: 0),
       child: GridView.builder(
-          itemCount: 4,
+          itemCount: products.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               mainAxisSpacing: 15,
@@ -99,13 +148,47 @@ class HomeOverviewListProducts extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           itemBuilder: (BuildContext context, int index) => GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/home/product_detail');
+                  Navigator.pushNamed(context, '/home/product_detail',
+                      arguments: {'product': products[index]});
                 },
                 child: ProductCard(
                   size: size,
+                  product: products[index],
                 ),
               )),
     );
+  }
+}
+
+class FutureHomeOverviewListProductsHorizontal extends StatelessWidget {
+  final Size size;
+
+  const FutureHomeOverviewListProductsHorizontal({required this.size, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<ProductsGetItems>(
+        future: ProductsDomainService.productsDomainService
+            .productsGetItems(headers: {
+          'orders': '[{"order":"inventorySalesQuantity","val":"desc"}]',
+        }),
+        builder:
+            (BuildContext context, AsyncSnapshot<ProductsGetItems> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: AppColors.primary30Color,
+              )),
+            );
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            return HomeOverviewListProductsHorizontal(
+                size: size, products: snapshot.data!.items);
+          }
+          return const Text('DEFAULT');
+        });
   }
 }
 
@@ -113,8 +196,10 @@ class HomeOverviewListProductsHorizontal extends StatelessWidget {
   const HomeOverviewListProductsHorizontal({
     Key? key,
     required this.size,
+    required this.products,
   }) : super(key: key);
 
+  final List<Product> products;
   final Size size;
 
   @override
@@ -124,7 +209,7 @@ class HomeOverviewListProductsHorizontal extends StatelessWidget {
       padding: const EdgeInsets.only(top: 0, left: 10, right: 10, bottom: 0),
       child: GridView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: 6,
+          itemCount: products.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
               mainAxisSpacing: 15,
@@ -134,10 +219,12 @@ class HomeOverviewListProductsHorizontal extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           itemBuilder: (BuildContext context, int index) => GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/home/product_detail');
+                  Navigator.pushNamed(context, '/home/product_detail',
+                      arguments: {'product': products[index]});
                 },
                 child: ProductCard(
                   size: size,
+                  product: products[index],
                 ),
               )),
     );

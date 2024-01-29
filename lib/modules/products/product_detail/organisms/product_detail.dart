@@ -1,12 +1,19 @@
-import 'package:ducco_shop/utils/fonts/fonts.dart';
+//+ FLUTTER
 import 'package:flutter/material.dart';
 
+//+ LIB CORE DOMAIN
+import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
+import 'package:ducco_shop/lib_core_domain/module.dart';
+
+//+ WIDGETS
+import 'package:ducco_shop/widgets/products/module.dart';
+
 //+ COLORS
+import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
-import 'package:ducco_shop/lib_core_ui/ui_cards/module.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({super.key});
@@ -14,6 +21,9 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final Map<String, dynamic> arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final Product product = arguments["product"];
 
     return SafeArea(
       child: Scaffold(
@@ -32,29 +42,30 @@ class ProductDetailScreen extends StatelessWidget {
                       height: 24,
                     ),
                     //+ TITLE
-                    const Column(
+                    Column(
                       children: <Widget>[
-                        Text('Pro Keyboard K/DA GX Blue',
-                            style: TextStyle(
+                        Text(product.detailTitleFo,
+                            style: const TextStyle(
                                 fontFamily: 'Roboto',
                                 fontWeight: FontWeight.w500,
                                 fontSize: 20,
                                 color: AppColors.secondary50Color)),
-                        Text('Logitech',
-                            style: TextStyle(
+                        Text(product.detailSubTitleFo,
+                            style: const TextStyle(
                                 fontFamily: 'Roboto',
                                 fontWeight: FontWeight.w300,
                                 fontSize: 16,
                                 color: AppColors.gray40Color)),
                       ],
                     ),
+                    const SizedBox(
+                      height: 16,
+                    ),
                     //+ IMAGEN DEL PRODUCTO
-                    const ClipOval(
-                      child: FadeInImage(
-                          height: 280,
-                          placeholder:
-                              AssetImage('assets/gifs/loading_rolling.gif'),
-                          image: NetworkImage('https://imgur.com/2yM2vNt.png')),
+                    ProductDetailScreenFlayersImages(
+                        size: size, imagesUrls: product.detailImagesUrlsFo),
+                    const SizedBox(
+                      height: 16,
                     ),
                     //+ PRECIO Y TOTAL
                     Padding(
@@ -62,7 +73,8 @@ class ProductDetailScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('S/ 150.00',
+                          Text(
+                              'S/ ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
                               style: AppFonts.titleHeavy(
                                   color: AppColors.secondary50Color,
                                   fontFamily: 'Ubuntu')),
@@ -101,23 +113,22 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 8,
+                      height: 24,
                     ),
                     //+ DESCRIPCIÓN DEL PRODUCTO
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Descripción',
+                          const Text('Descripción',
                               style: TextStyle(
                                   fontFamily: 'Roboto',
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: AppColors.primary30Color)),
-                          Text(
-                              'Lorem Ipsum is simply dummy text of the printing and typesetting industry. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
-                              style: TextStyle(
+                          Text(product.detailDescriptionFo,
+                              style: const TextStyle(
                                   fontFamily: 'Roboto',
                                   fontSize: 16,
                                   color: AppColors.gray50Color)),
@@ -125,13 +136,13 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 8,
+                      height: 24,
                     ),
                     //+ DESCRIPCIÓN DEL PRODUCTO
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('Clientes que vieron este producto también vieron',
+                        Text('Te podrían interesar',
                             textAlign: TextAlign.start,
                             style: AppFonts.labelTextHeavy(
                                 color: AppColors.gray25Color,
@@ -139,18 +150,9 @@ class ProductDetailScreen extends StatelessWidget {
                         const SizedBox(
                           height: 12,
                         ),
-                        SizedBox(
-                          height: 300,
-                          child: ListView.separated(
-                              physics: const BouncingScrollPhysics(),
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(width: 16),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 5,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ProductCard(size: size);
-                              }),
-                        ),
+                        FutureHomeOverviewListProductsHorizontal(
+                          size: size,
+                        )
                       ],
                     ),
                     const SizedBox(
@@ -161,7 +163,7 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               //+ BOTON DE COMPRAR
               MaterialButton(
-                color: AppColors.secondary50Color,
+                color: AppColors.secondary60Color,
                 onPressed: (() => {}),
                 child: const Text(
                   'AGREGAR AL CARRITO',
@@ -170,7 +172,6 @@ class ProductDetailScreen extends StatelessWidget {
                     fontFamily: 'Roboto',
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
-                    height: 2,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -206,6 +207,174 @@ class ProductDetailScreenAppBar extends StatelessWidget {
           color: AppColors.secondary60Color,
           backgroundColor: AppColors.gray60Color,
           onTapFunction: () => {},
+        )
+      ],
+    );
+  }
+}
+
+class FutureHomeOverviewListProductsHorizontal extends StatelessWidget {
+  final Size size;
+
+  const FutureHomeOverviewListProductsHorizontal({required this.size, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<ProductsGetItems>(
+        future: ProductsDomainService.productsDomainService
+            .productsGetItems(headers: {
+          'orders': '[{"order":"inventorySalesQuantity","val":"desc"}]',
+        }),
+        builder:
+            (BuildContext context, AsyncSnapshot<ProductsGetItems> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: AppColors.primary30Color,
+              )),
+            );
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            return HomeOverviewListProductsHorizontal(
+                size: size, products: snapshot.data!.items);
+          }
+          return const Text('DEFAULT');
+        });
+  }
+}
+
+class HomeOverviewListProductsHorizontal extends StatelessWidget {
+  const HomeOverviewListProductsHorizontal({
+    Key? key,
+    required this.size,
+    required this.products,
+  }) : super(key: key);
+
+  final List<Product> products;
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      padding: const EdgeInsets.only(top: 0, left: 10, right: 10, bottom: 0),
+      child: GridView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: products.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 10,
+              mainAxisExtent: 180,
+              childAspectRatio: 20),
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) => GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/home/product_detail',
+                      arguments: {'product': products[index]});
+                },
+                child: ProductCard(
+                  size: size,
+                  product: products[index],
+                ),
+              )),
+    );
+  }
+}
+
+class ProductDetailScreenFlayersImages extends StatefulWidget {
+  const ProductDetailScreenFlayersImages({
+    Key? key,
+    required this.size,
+    required this.imagesUrls,
+  }) : super(key: key);
+
+  final Size size;
+  final List<String> imagesUrls;
+
+  @override
+  State<ProductDetailScreenFlayersImages> createState() =>
+      _ProductDetailScreenFlayersImagesState();
+}
+
+class _ProductDetailScreenFlayersImagesState
+    extends State<ProductDetailScreenFlayersImages> {
+  final ScrollController _controller = ScrollController();
+  int currentIndex = 0;
+  double currentPostion = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      var index = double.parse(
+          (_controller.position.pixels / (widget.size.width - 24))
+              .toStringAsPrecision(2));
+
+      setState(() {
+        currentIndex = index.toInt();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 300,
+          child: ListView.builder(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.imagesUrls.length,
+            physics: const PageScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return ClipRRect(
+                child: FadeInImage(
+                    width: widget.size.width - 24,
+                    placeholder: const AssetImage('assets/gifs/loading.gif'),
+                    fit: BoxFit.cover,
+                    image: NetworkImage(widget.imagesUrls[index])),
+              );
+            },
+          ),
+        ),
+        SizedBox(
+          width: widget.imagesUrls.length * 20 +
+              10 * (widget.imagesUrls.length - 1),
+          height: 20,
+          child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.imagesUrls.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  width: 10,
+                );
+              },
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                    _controller.animateTo(index * (widget.size.width - 24),
+                        duration: const Duration(milliseconds: 100),
+                        curve: Curves.easeInOut);
+                  },
+                  child: Container(
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                        color: index == currentIndex
+                            ? AppColors.black50Color
+                            : AppColors.black70Color,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                  ),
+                );
+              }),
         )
       ],
     );

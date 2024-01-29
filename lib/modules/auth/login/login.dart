@@ -66,8 +66,6 @@ class _FormLoginState extends State<_FormLogin> {
                           if (usernameCtrl.text == 'root' &&
                               passwordCtrl.text == 'root')
                             {Navigator.pushNamed(context, '/home/overview')}
-                          else
-                            {debugPrint('VETE')}
                         }),
               ],
             ),

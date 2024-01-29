@@ -9,7 +9,7 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 
 //+ LIB CORE SDKS
-import 'package:ducco_shop/lib_core_sdks/providers/module.dart';
+import 'package:ducco_shop/lib_shares/services/providers/module.dart';
 
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';

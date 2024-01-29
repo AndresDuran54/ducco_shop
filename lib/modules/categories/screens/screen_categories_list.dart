@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 //+ LIB CORE SDKS
-import 'package:ducco_shop/lib_core_sdks/providers/module.dart';
+import 'package:ducco_shop/lib_shares/services/providers/module.dart';
 
 //+ UTILS
 import 'package:ducco_shop/utils/colors/colors.dart';

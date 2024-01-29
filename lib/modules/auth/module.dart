@@ -10,9 +10,6 @@ class AuthModule extends StatelessWidget {
       initialRoute: '/auth/login',
       onGenerateRoute: (RouteSettings settings) {
         WidgetBuilder builder;
-        debugPrint('settings.name');
-        debugPrint(settings.name);
-        debugPrint('settings.name');
         switch (settings.name) {
           case '/auth/login':
             builder = (BuildContext context) => const LoginScreen();

@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
 
-//+ MODULES
-import 'package:ducco_shop/widgets/products/module.dart';
-
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_accordion/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
@@ -29,7 +26,7 @@ class ScreenCategoriesResult extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          ScreenCategoriesResultBody(size: size),
+          // ScreenCategoriesResultBody(size: size),
           const SizedBox(
             height: 15,
           ),
@@ -154,34 +151,34 @@ class _ScreenCategoriesResultPaginatorState
   }
 }
 
-class ScreenCategoriesResultBody extends StatelessWidget {
-  final int itemCount = 5;
+// class ScreenCategoriesResultBody extends StatelessWidget {
+//   final int itemCount = 5;
 
-  const ScreenCategoriesResultBody({
-    super.key,
-    required this.size,
-  });
+//   const ScreenCategoriesResultBody({
+//     super.key,
+//     required this.size,
+//   });
 
-  final Size size;
+//   final Size size;
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height:
-          ((itemCount / 2).ceil()) * 300 + ((itemCount / 2).ceil() - 1) * 15,
-      child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: itemCount,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-              mainAxisExtent: 300),
-          itemBuilder: (BuildContext context, int index) =>
-              ProductCard(size: size)),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height:
+//           ((itemCount / 2).ceil()) * 300 + ((itemCount / 2).ceil() - 1) * 15,
+//       child: GridView.builder(
+//           physics: const NeverScrollableScrollPhysics(),
+//           itemCount: itemCount,
+//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//               crossAxisCount: 2,
+//               mainAxisSpacing: 15,
+//               crossAxisSpacing: 15,
+//               mainAxisExtent: 300),
+//           itemBuilder: (BuildContext context, int index) =>
+//               ProductCard(size: size)),
+//     );
+//   }
+// }
 
 class ScreenCategoriesResultHeader extends StatelessWidget {
   const ScreenCategoriesResultHeader({

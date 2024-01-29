@@ -1,4 +1,5 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:flutter/material.dart';
 
 //+ UTILS
@@ -8,10 +9,15 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 
+//+ LIB DOMAIN
+import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
+
 class ProductCard extends StatelessWidget {
-  const ProductCard({Key? key, required this.size}) : super(key: key);
+  const ProductCard({Key? key, required this.size, required this.product})
+      : super(key: key);
 
   final Size size;
+  final Product product;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +47,9 @@ class ProductCard extends StatelessWidget {
                   ),
                   SizedBox(
                     width: size.width - 20,
-                    child: const Text(
-                      'Logitech',
-                      style: TextStyle(
+                    child: Text(
+                      product.cardTitleFo,
+                      style: const TextStyle(
                         color: AppColors.gray90Color,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w500,
@@ -54,9 +60,9 @@ class ProductCard extends StatelessWidget {
                   ),
                   SizedBox(
                     width: size.width - 20,
-                    child: const Text(
-                      'Teclado mecánico alambrico con luces RGB',
-                      style: TextStyle(
+                    child: Text(
+                      product.cardSubTitleFo,
+                      style: const TextStyle(
                           color: AppColors.gray90Color,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w200,
@@ -68,7 +74,7 @@ class ProductCard extends StatelessWidget {
                   SizedBox(
                     width: size.width - 20,
                     child: Text(
-                      'S/60.00',
+                      'S/. ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
                       style: AppFonts.mainTextHeavy(
                           color: AppColors.black100Color, fontFamily: 'Ubuntu'),
                       textAlign: TextAlign.start,
@@ -99,13 +105,12 @@ class ProductCard extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              child: const ClipOval(
+              child: ClipOval(
                 child: FadeInImage(
                     placeholderFit: BoxFit.cover,
-                    placeholder: AssetImage('assets/gifs/loading.gif'),
+                    placeholder: const AssetImage('assets/gifs/loading.gif'),
                     fit: BoxFit.cover,
-                    image: NetworkImage(
-                        'https://promart.vteximg.com.br/arquivos/ids/6571809-1000-1000/image-e141cd34a31b46738915da3046190205.jpg?v=638012766471300000')),
+                    image: NetworkImage(product.cardImgUrlFo)),
               ),
             ),
           )
