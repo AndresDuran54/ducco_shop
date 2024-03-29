@@ -1,21 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
-class IEnvDomainMicrosWallet {
-  final String HOST;
 
-  const IEnvDomainMicrosWallet({required this.HOST});
-}
-
-class IEnvDomainMicrosProduts {
-  final String HOST;
-
-  const IEnvDomainMicrosProduts({required this.HOST});
-}
+import 'package:ducco_shop/lib_core_domain/domain/env_categories_domain.dart';
+import 'package:ducco_shop/lib_core_domain/domain/env_products_domain.dart';
 
 class IEnvDomainMicros {
-  final IEnvDomainMicrosProduts PRODUCTS;
-  final IEnvDomainMicrosWallet WALLET;
+  final IEnvDomainMicrosProducts PRODUCTS;
+  final IEnvDomainMicrosCategories CATEGORIES;
 
-  const IEnvDomainMicros({required this.PRODUCTS, required this.WALLET});
+  const IEnvDomainMicros({required this.PRODUCTS, required this.CATEGORIES});
 }
 
 class IEnvDomain {
@@ -26,5 +18,9 @@ class IEnvDomain {
 
 IEnvDomain env = const IEnvDomain(
     MICROS: IEnvDomainMicros(
-        PRODUCTS: IEnvDomainMicrosProduts(HOST: "http://10.0.2.2:8080"),
-        WALLET: IEnvDomainMicrosWallet(HOST: "http://127.0.0.1:9001")));
+        PRODUCTS: IEnvDomainMicrosProducts(
+            HOST: "http://10.0.2.2:8080",
+            VARS: IEnvDomainMicrosProductsVars(CURRENCY_SYMBOL: 'S/.')),
+        CATEGORIES: IEnvDomainMicrosCategories(
+            HOST: 'http://10.0.2.2:8090',
+            VARS: IEnvDomainMicrosCategoriesVars())));

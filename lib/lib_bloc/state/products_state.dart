@@ -1,70 +1,37 @@
 import 'package:ducco_shop/lib_core_domain/entities/products_domain.dart';
 
-//+ Clase padre para los estados realizados con la gestión de productos
-class ProductsState {
-  final bool loading;
-  final bool error;
-  final bool success;
-  final List<Product> products;
+class ShoppingCardProducts {
+  final Product product;
+  int quantity;
 
-  //+ Constructor
-  const ProductsState({
-    required this.loading,
-    required this.error,
-    required this.success,
-    required this.products,
+  ShoppingCardProducts({
+    required this.product,
+    required this.quantity,
   });
-
-  //+ Método para copiar el estado actual
-  ProductsState copyWith({
-    bool? loading,
-    bool? error,
-    List<Product>? products,
-  }) =>
-      ProductsState(
-          loading: loading ?? this.loading,
-          error: error ?? this.error,
-          success: error ?? this.success,
-          products: products ?? this.products);
 }
 
-//+ Estado que indica que la aplicación actualmente está cargando datos
-class ProductsLoadingState extends ProductsState {
+//+ Clase padre para los estados realizados con la gestión de productos
+class ShoppingCartState {
+  //+ Lista para almacenar los productos y la cantidad
+  final List<ShoppingCardProducts> products;
+  int subTotalAmount;
+
   //+ Constructor
-  ProductsLoadingState({
-    required bool loading,
-    required bool error,
-    required bool success,
-    required List<Product> products,
-  }) : super(
-            loading: loading,
-            error: error,
-            success: success,
-            products: products);
+  ShoppingCartState({required this.products, this.subTotalAmount = 0});
 }
 
-//+ Estado que indica que la aplicación ya cargo los datos
-class ProductsLoadedState extends ProductsState {
+//+ Estado que el carrito de compras está vació
+class ShoppingCartEmptyState extends ShoppingCartState {
   //+ Constructor
-  ProductsLoadedState({
-    required bool loading,
-    required bool error,
-    required bool success,
-    required List<Product> products,
-  }) : super(
-          loading: loading,
-          error: error,
-          success: success,
-          products: products,
-        );
+  ShoppingCartEmptyState({
+    required List<ShoppingCardProducts> products,
+  }) : super(products: products);
 }
 
-// //+ Estado que indica que la aplicación obtuvo un error al cargar datos
-// class ProductsErrorState extends ProductsState {
-//   //+ Constructor
-//   ProductsErrorState({
-//     required bool loading,
-//     required bool error,
-//     required List<Product> products,
-//   }) : super(loading: loading, error: error, products: products);
-// }
+//+ Estado que indica que el carrito tiene productos
+class ShoppingCartPackedState extends ShoppingCartState {
+  //+ Constructor
+  ShoppingCartPackedState(
+      {required List<ShoppingCardProducts> products, required subTotalAmount})
+      : super(products: products, subTotalAmount: subTotalAmount);
+}

@@ -6,6 +6,8 @@ class NavigationModel with ChangeNotifier {
   final PageController _pageController = new PageController();
   //+ Indice de la página actual
   int _actualPage = 0;
+  //+ Información adicional
+  Map<String, dynamic> paramsPage = {};
 
   NavigationModel() {
     //+ Agregamos un listener para el cambio de página

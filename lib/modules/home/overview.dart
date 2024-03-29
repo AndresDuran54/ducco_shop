@@ -1,5 +1,4 @@
 //+ FLUTTER
-import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:flutter/material.dart';
 
 //+ UTILS
@@ -8,6 +7,9 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 
 //+ MODULES
 import 'package:ducco_shop/widgets/products/module.dart';
+
+//+ LIB CORE DOMAIN
+import 'package:ducco_shop/lib_core_domain/module.dart';
 
 class HomeOverview extends StatelessWidget {
   const HomeOverview({super.key});
@@ -53,18 +55,6 @@ class BodyHomeOverview extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          // BlocBuilder<ProductsBloc, ProductsState>(
-          //     builder: (BuildContext context, ProductsState state) {
-          //   if (state.error) {
-          //     return const Text('STATE ERROR');
-          //   } else if (state.loading) {
-          //     return const Text('STATE LOADING');
-          //   } else if (state.success) {
-          //     return HomeOverviewListProducts(
-          //         size: size, products: state.products);
-          //   }
-          //   return const Text('STATE DEFAULT');
-          // }),
           FutureHomeOverviewListProducts(size: size),
           const SizedBox(
             height: 10,

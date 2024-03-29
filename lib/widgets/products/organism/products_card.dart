@@ -1,6 +1,7 @@
 //+ FLUTTER
-import 'package:ducco_shop/lib_core_domain/module.dart';
+import 'package:ducco_shop/lib_core_domain/domain/env_domain.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 //+ UTILS
 import 'package:ducco_shop/utils/colors/colors.dart';
@@ -10,17 +11,25 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 
 //+ LIB DOMAIN
+import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
 
+//+ LIB BLOC
+import 'package:ducco_shop/lib_bloc/module.dart';
+
 class ProductCard extends StatelessWidget {
-  const ProductCard({Key? key, required this.size, required this.product})
+  ProductCard({Key? key, required this.size, required this.product})
       : super(key: key);
 
   final Size size;
   final Product product;
+  int productIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    final ShoppingCartBloc shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
+
     return Container(
       decoration: BoxDecoration(
           color: AppColors.gray70Color,
@@ -49,6 +58,8 @@ class ProductCard extends StatelessWidget {
                     width: size.width - 20,
                     child: Text(
                       product.cardTitleFo,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.gray90Color,
                         fontFamily: 'Roboto',
@@ -74,22 +85,31 @@ class ProductCard extends StatelessWidget {
                   SizedBox(
                     width: size.width - 20,
                     child: Text(
-                      'S/. ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
+                      '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
                       style: AppFonts.mainTextHeavy(
                           color: AppColors.black100Color, fontFamily: 'Ubuntu'),
                       textAlign: TextAlign.start,
                     ),
                   ),
-                  UIButtonIcon(
-                      height: 30,
-                      onPressedFunc: () {},
-                      enabledColor: AppColors.secondary60Color,
-                      disabledColor: AppColors.secondary40Color,
-                      splashColor: AppColors.gray100Color,
-                      iconData: Icons.shopping_cart,
-                      textStyle: AppFonts.mainTextHeavy(
-                          color: AppColors.black100Color, fontFamily: 'Ubuntu'),
-                      text: 'AGREGAR')
+                  BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+                      builder: (BuildContext context, ShoppingCartState state) {
+                    productIndex = shoppingCartBloc.getProductCart(product)[1];
+                    return UIButtonIcon(
+                        height: 30,
+                        onPressedFunc: productIndex == -1
+                            ? () {
+                                shoppingCartBloc.addProduct(product, 1);
+                              }
+                            : null,
+                        enabledColor: AppColors.secondary60Color,
+                        disabledColor: AppColors.secondary40Color,
+                        splashColor: AppColors.gray100Color,
+                        iconData: Icons.shopping_cart,
+                        textStyle: AppFonts.mainTextHeavy(
+                            color: AppColors.black100Color,
+                            fontFamily: 'Ubuntu'),
+                        text: 'AGREGAR');
+                  })
                 ],
               ),
             ),

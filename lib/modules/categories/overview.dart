@@ -35,7 +35,7 @@ class CategoriesBodyOverview extends StatelessWidget {
     return PageView(
       controller: navigationModel.pageController,
       children: const <Widget>[
-        ScreenCategoriesList(),
+        ScreenCategoriesOverview(),
         ScreenCategoriesResult(),
       ],
     );

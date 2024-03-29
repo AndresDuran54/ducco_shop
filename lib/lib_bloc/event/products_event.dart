@@ -1,23 +1,55 @@
 import 'package:ducco_shop/lib_core_domain/entities/products_domain.dart';
 
 //+ Clase padre para los eventos
-abstract class ProductsEvent {
+abstract class ShoppingCartEvent {
   //+ Constructor
-  const ProductsEvent();
+  const ShoppingCartEvent();
 }
 
-//+ Evento de obtención de los registros de los productos
-class GetProductsEvent extends ProductsEvent {
-  final List<Product> products;
+//+ Evento para agregar un producto al carrito
+class ShoppingCartAddProductEvent extends ShoppingCartEvent {
+  final Product product;
+  final int quantity;
 
   //+ Constructor
-  const GetProductsEvent({
-    required this.products,
+  const ShoppingCartAddProductEvent({
+    required this.product,
+    required this.quantity,
+  });
+}
+
+//+ Evento para remover un producto del carrito
+class ShoppingCartRemoveProductEvent extends ShoppingCartEvent {
+  final int indexProduct;
+
+  //+ Constructor
+  const ShoppingCartRemoveProductEvent({
+    required this.indexProduct,
+  });
+}
+
+//+ Evento para aumentar cantidad de un producto del carrito de compras
+class ShoppingCartPlusProductEvent extends ShoppingCartEvent {
+  final int indexProduct;
+
+  //+ Constructor
+  const ShoppingCartPlusProductEvent({
+    required this.indexProduct,
+  });
+}
+
+//+ Evento para disminuir cantidad de un producto del carrito de compras
+class ShoppingCartLessProductEvent extends ShoppingCartEvent {
+  final int indexProduct;
+
+  //+ Constructor
+  const ShoppingCartLessProductEvent({
+    required this.indexProduct,
   });
 }
 
 //+ Evento de error en la obtención de los registros de los productos
-class GetProductsErrorEvent extends ProductsEvent {
+class ShoppingCartErrorEvent extends ShoppingCartEvent {
   //+ Constructor
-  const GetProductsErrorEvent();
+  const ShoppingCartErrorEvent();
 }

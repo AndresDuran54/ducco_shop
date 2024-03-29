@@ -1,4 +1,8 @@
+//+ DEPENDENCIES
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 //+ FLUTTER
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 //+ UTILS
@@ -9,41 +13,110 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:ducco_shop/lib_core_ui/ui_accordion/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 
+//+ LIB SHARES
+import 'package:ducco_shop/lib_shares/services/providers/module.dart';
+
+//+ LIB CORE DOMAIN
+import 'package:ducco_shop/lib_core_domain/module.dart';
+
+//+ MODULES
+import 'package:ducco_shop/widgets/products/module.dart';
+
+//+ DEPENDENCIES
+import 'package:ducco_shop/lib_bloc/module.dart';
+
+//+ LIB BLOC
+import 'package:provider/provider.dart';
+
 class ScreenCategoriesResult extends StatelessWidget {
   const ScreenCategoriesResult({super.key});
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final CategoryProductsBloc categoryProductsBloc =
+        BlocProvider.of<CategoryProductsBloc>(context);
+
+    //+ Inicializamos la vista
+    categoryProductsBloc.initView(1);
+
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: ListView(
+      child: Column(
         children: <Widget>[
-          const SizedBox(
-            height: 15,
-          ),
           const ScreenCategoriesResultHeader(),
           const SizedBox(
-            height: 15,
+            height: 8,
           ),
-          // ScreenCategoriesResultBody(size: size),
+          Expanded(
+            child: BlocBuilder<CategoryProductsBloc, CategoryProductsState>(
+              builder: (BuildContext context, CategoryProductsState state) {
+                if (state is CategoryProductsLoadingState) {
+                  return ScreenCategoriesResultBody(
+                      size: size, products: state.products!);
+                } else if (state is CategoryProductsPackedState) {
+                  return ScreenCategoriesResultBody(
+                      size: size, products: state.products!);
+                }
+                return ScreenCategoriesResultBody(
+                    size: size, products: state.products!);
+              },
+            ),
+          ),
           const SizedBox(
-            height: 15,
+            height: 8,
           ),
-          ScreenCategoriesResultPaginator(size: size)
+          ScreenCategoriesResultPaginator(
+              size: size,
+              categoryProductsBloc: categoryProductsBloc,
+              itemsCounter: 25)
         ],
       ),
     );
   }
 }
 
-class ScreenCategoriesResultPaginator extends StatefulWidget {
-  const ScreenCategoriesResultPaginator({
+class ScreenCategoriesResultBody extends StatelessWidget {
+  final List<Product> products;
+  final Size size;
+
+  const ScreenCategoriesResultBody({
     super.key,
+    required this.products,
     required this.size,
   });
 
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 400,
+      child: GridView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: products.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              mainAxisExtent: 300),
+          itemBuilder: (BuildContext context, int i) => ProductCard(
+                size: size,
+                product: products[i],
+              )),
+    );
+  }
+}
+
+class ScreenCategoriesResultPaginator extends StatefulWidget {
   final Size size;
+  final CategoryProductsBloc categoryProductsBloc;
+  final int itemsCounter;
+
+  const ScreenCategoriesResultPaginator({
+    super.key,
+    required this.size,
+    required this.categoryProductsBloc,
+    required this.itemsCounter,
+  });
 
   @override
   State<ScreenCategoriesResultPaginator> createState() =>
@@ -52,24 +125,55 @@ class ScreenCategoriesResultPaginator extends StatefulWidget {
 
 class _ScreenCategoriesResultPaginatorState
     extends State<ScreenCategoriesResultPaginator> {
+  //+ Controlador para el paginador
   final ScrollController _controller = ScrollController();
+  //+ Indice actual del paginador
   int currentIndex = 1;
-  int itemCount = 7;
+  //+ Ancho de cada indice en el paginador
   late double itemWidth;
+  //+ Cantidad de pagidores
+  late int pagingsCount;
+  //+ Subscrición a los estados de Bloc
+  late StreamSubscription<CategoryProductsState> streamSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    this.itemWidth =
-        (widget.size.width / 2) / (this.itemCount > 3 ? 3 : this.itemCount);
+    //+ Calculamos el ancho de cada indice en el paginador
+    this.itemWidth = (widget.size.width / 2) /
+        (widget.itemsCounter > 3 ? 3 : widget.itemsCounter);
+
+    //+ Calculamos el número de paginadores
+    this.pagingsCount = (widget.itemsCounter / 10).round();
+
+    //+ Nos suscribimos a los cambios de estado del bloc
+    this.streamSubscription = widget.categoryProductsBloc.stream
+        .listen((CategoryProductsState state) {
+      setState(() {
+        if (state is CategoryProductsPackedState) {
+          //+ Calculamos el ancho de cada indice en el paginador
+          this.itemWidth = (widget.size.width / 2) /
+              (state.itemsCounter! > 3 ? 3 : state.itemsCounter!);
+
+          //+ Calculamos el número de paginadores
+          this.pagingsCount = (state.itemsCounter! / 10).round();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    //+ Nos desuscribimos a los cambios de estado del bloc
+    this.streamSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 50,
-      width: widget.size.width / 1.2,
       decoration: BoxDecoration(
           color: AppColors.gray30Color, borderRadius: BorderRadius.circular(8)),
       child: Row(
@@ -78,14 +182,20 @@ class _ScreenCategoriesResultPaginatorState
           GestureDetector(
             onTap: () => {
               this.setState(() {
+                //+ Calculamos el indice actual
                 this.currentIndex =
                     this.currentIndex - 1 < 1 ? 1 : this.currentIndex - 1;
+
+                //+ Hacemos la animación del paginador
                 if (this.currentIndex > 2) {
                   this._controller.animateTo(
                       this._controller.offset - this.itemWidth,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeInOut);
                 }
+
+                //+ Notificamos el cambio de paginado
+                widget.categoryProductsBloc.changePagination(this.currentIndex);
               })
             },
             child: Container(
@@ -100,14 +210,19 @@ class _ScreenCategoriesResultPaginatorState
             decoration: const BoxDecoration(color: AppColors.gray25Color),
             child: ListView.builder(
                 controller: _controller,
-                itemCount: itemCount,
+                itemCount: this.pagingsCount,
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int i) => GestureDetector(
-                      onTap: () => {
+                      onTap: () {
                         this.setState(() {
+                          //+ Establecemos el indice actual
                           this.currentIndex = i + 1;
-                        })
+                        });
+
+                        //+ Notificamos el cambio del indice
+                        widget.categoryProductsBloc
+                            .changePagination(this.currentIndex);
                       },
                       child: Container(
                         width: this.itemWidth,
@@ -127,15 +242,21 @@ class _ScreenCategoriesResultPaginatorState
           GestureDetector(
             onTap: () => {
               this.setState(() {
-                this.currentIndex = this.currentIndex + 1 > this.itemCount
-                    ? this.itemCount
+                //+ Calculamos el indice actual
+                this.currentIndex = this.currentIndex + 1 > this.pagingsCount
+                    ? this.pagingsCount
                     : this.currentIndex + 1;
+
+                //+ Hacemos la animación del paginador
                 if (this.currentIndex > 3) {
                   this._controller.animateTo(
                       this._controller.offset + this.itemWidth,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeInOut);
                 }
+
+                //+ Notificamos el cambio del indice
+                widget.categoryProductsBloc.changePagination(this.currentIndex);
               })
             },
             child: Container(
@@ -151,35 +272,6 @@ class _ScreenCategoriesResultPaginatorState
   }
 }
 
-// class ScreenCategoriesResultBody extends StatelessWidget {
-//   final int itemCount = 5;
-
-//   const ScreenCategoriesResultBody({
-//     super.key,
-//     required this.size,
-//   });
-
-//   final Size size;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       height:
-//           ((itemCount / 2).ceil()) * 300 + ((itemCount / 2).ceil() - 1) * 15,
-//       child: GridView.builder(
-//           physics: const NeverScrollableScrollPhysics(),
-//           itemCount: itemCount,
-//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//               crossAxisCount: 2,
-//               mainAxisSpacing: 15,
-//               crossAxisSpacing: 15,
-//               mainAxisExtent: 300),
-//           itemBuilder: (BuildContext context, int index) =>
-//               ProductCard(size: size)),
-//     );
-//   }
-// }
-
 class ScreenCategoriesResultHeader extends StatelessWidget {
   const ScreenCategoriesResultHeader({
     super.key,
@@ -187,6 +279,8 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final navigationModel = Provider.of<NavigationModel>(context);
+
     return Container(
       decoration: BoxDecoration(
           color: AppColors.black30Color,
@@ -199,7 +293,7 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  'Celulares y Teléfonos',
+                  navigationModel.paramsPage['category'].nameFo,
                   style: AppFonts.labelTextLight(
                       color: AppColors.gray85Color, fontFamily: 'Ubuntu'),
                 ),

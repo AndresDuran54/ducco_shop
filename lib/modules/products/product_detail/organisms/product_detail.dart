@@ -1,5 +1,7 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_core_domain/domain/env_domain.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 //+ LIB CORE DOMAIN
 import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
@@ -14,6 +16,10 @@ import 'package:ducco_shop/utils/colors/colors.dart';
 
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
+
+//+ LIB BLOC
+import 'package:ducco_shop/lib_bloc/module.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({super.key});
@@ -23,7 +29,12 @@ class ProductDetailScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     final Map<String, dynamic> arguments =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final Product product = arguments["product"];
+    final ShoppingCartBloc shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
+    final List<dynamic> getProductResult =
+        shoppingCartBloc.getProductCart(arguments["product"]);
+    ShoppingCardProducts shoppingCardProducts = getProductResult[0];
+    int indexProduct = getProductResult[1];
 
     return SafeArea(
       child: Scaffold(
@@ -41,16 +52,15 @@ class ProductDetailScreen extends StatelessWidget {
                     const SizedBox(
                       height: 24,
                     ),
-                    //+ TITLE
                     Column(
                       children: <Widget>[
-                        Text(product.detailTitleFo,
+                        Text(shoppingCardProducts.product.detailTitleFo,
                             style: const TextStyle(
                                 fontFamily: 'Roboto',
                                 fontWeight: FontWeight.w500,
                                 fontSize: 20,
                                 color: AppColors.secondary50Color)),
-                        Text(product.detailSubTitleFo,
+                        Text(shoppingCardProducts.product.detailSubTitleFo,
                             style: const TextStyle(
                                 fontFamily: 'Roboto',
                                 fontWeight: FontWeight.w300,
@@ -61,61 +71,53 @@ class ProductDetailScreen extends StatelessWidget {
                     const SizedBox(
                       height: 16,
                     ),
-                    //+ IMAGEN DEL PRODUCTO
                     ProductDetailScreenFlayersImages(
-                        size: size, imagesUrls: product.detailImagesUrlsFo),
+                        size: size,
+                        imagesUrls:
+                            shoppingCardProducts.product.detailImagesUrlsFo),
                     const SizedBox(
                       height: 16,
                     ),
-                    //+ PRECIO Y TOTAL
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                              'S/ ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
+                              '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(shoppingCardProducts.product.inventoryPrice, 2)}',
                               style: AppFonts.titleHeavy(
                                   color: AppColors.secondary50Color,
                                   fontFamily: 'Ubuntu')),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                                color: AppColors.gray70Color,
-                                borderRadius: BorderRadius.circular(4)),
-                            child: const Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Icon(Icons.remove,
-                                    size: 32, color: AppColors.gray50Color),
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 8),
-                                  child: Text('3',
-                                      style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 24,
-                                          color: AppColors.primary20Color)),
-                                ),
-                                SizedBox(
-                                  width: 12,
-                                ),
-                                Icon(Icons.add,
-                                    size: 32, color: AppColors.gray50Color)
-                              ],
-                            ),
-                          )
+                          BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+                              builder: (BuildContext context,
+                                  ShoppingCartState state) {
+                            if (indexProduct != -1) {
+                              final List<dynamic> getProductResult =
+                                  shoppingCartBloc
+                                      .getProductCart(arguments["product"]);
+                              ShoppingCardProducts shoppingCardProducts =
+                                  getProductResult[0];
+                              int indexProduct = getProductResult[1];
+                              return CoreUIInputSlider(
+                                productQuantity: shoppingCardProducts.quantity,
+                                onPressedLessFunc: () {
+                                  shoppingCartBloc.lessProduct(indexProduct);
+                                },
+                                onPressedPlusFunc: () {
+                                  shoppingCartBloc.plusProduct(indexProduct);
+                                },
+                                hideIconRemove: true,
+                              );
+                            } else {
+                              return Container();
+                            }
+                          })
                         ],
                       ),
                     ),
                     const SizedBox(
                       height: 24,
                     ),
-                    //+ DESCRIPCIÓN DEL PRODUCTO
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -127,7 +129,7 @@ class ProductDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: AppColors.primary30Color)),
-                          Text(product.detailDescriptionFo,
+                          Text(shoppingCardProducts.product.detailDescriptionFo,
                               style: const TextStyle(
                                   fontFamily: 'Roboto',
                                   fontSize: 16,
@@ -138,7 +140,6 @@ class ProductDetailScreen extends StatelessWidget {
                     const SizedBox(
                       height: 24,
                     ),
-                    //+ DESCRIPCIÓN DEL PRODUCTO
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -161,19 +162,32 @@ class ProductDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              //+ BOTON DE COMPRAR
               MaterialButton(
                 color: AppColors.secondary60Color,
-                onPressed: (() => {}),
-                child: const Text(
-                  'AGREGAR AL CARRITO',
-                  style: TextStyle(
-                    color: AppColors.gray90Color,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
+                onPressed: (() {
+                  if (indexProduct == -1) {
+                    indexProduct = shoppingCartBloc.addProduct(
+                        shoppingCardProducts.product, 1);
+                  } else {
+                    shoppingCartBloc.removeProduct(indexProduct);
+                    indexProduct = -1;
+                  }
+                }),
+                child: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+                  builder: (BuildContext context, ShoppingCartState state) {
+                    return Text(
+                      indexProduct == -1
+                          ? 'AGREGAR AL CARRITO'
+                          : 'QUITAR AL CARRITO',
+                      style: const TextStyle(
+                        color: AppColors.gray90Color,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
               )
             ],

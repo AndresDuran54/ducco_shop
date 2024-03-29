@@ -1,10 +1,16 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_core_domain/domain/env_domain.dart';
+import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:flutter/material.dart';
 
+//+ LIB BLOC
+import 'package:ducco_shop/lib_bloc/module.dart';
+
 //+ DEPENDENCIES
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 //+ LIB CORE SDKS
 import 'package:ducco_shop/lib_shares/services/providers/module.dart';
@@ -24,27 +30,65 @@ class ScreenProducts extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Stack(children: <Widget>[
-        const ScreenProductsList(),
-        Positioned(
-            bottom: 0,
-            child: ScreenProductsResume(
-                size: size, navigationModel: navigationModel))
+        BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+            builder: (BuildContext context, ShoppingCartState state) {
+          if (state is ShoppingCartEmptyState) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: Center(
+                child: Image.asset(
+                    'assets/images/modules/shopping_cart/shopping_cart_empty.png'),
+              ),
+            );
+          } else if (state is ShoppingCartPackedState) {
+            return ScreenProductsList(products: state.products);
+          }
+          return const ScreenProductsList(products: []);
+        }),
+        BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+            builder: (BuildContext context, ShoppingCartState state) {
+          if (state is ShoppingCartEmptyState) {
+            return Positioned(
+                bottom: 0,
+                child: ScreenProductsResume(
+                    subTotalAmount: state.subTotalAmount,
+                    size: size,
+                    navigationModel: navigationModel,
+                    productsListEmpty: true));
+          } else if (state is ShoppingCartPackedState) {
+            return Positioned(
+                bottom: 0,
+                child: ScreenProductsResume(
+                    subTotalAmount: state.subTotalAmount,
+                    size: size,
+                    navigationModel: navigationModel,
+                    productsListEmpty: false));
+          }
+          return Positioned(
+              bottom: 0,
+              child: ScreenProductsResume(
+                  subTotalAmount: 0,
+                  size: size,
+                  navigationModel: navigationModel,
+                  productsListEmpty: false));
+        }),
       ]),
     );
   }
 }
 
-// ScreenProductsResume(size: size, navigationModel: navigationModel),
-
 class ScreenProductsResume extends StatelessWidget {
-  const ScreenProductsResume({
-    super.key,
-    required this.size,
-    required this.navigationModel,
-  });
+  const ScreenProductsResume(
+      {super.key,
+      required this.size,
+      required this.navigationModel,
+      required this.subTotalAmount,
+      required this.productsListEmpty});
 
   final Size size;
   final NavigationModel navigationModel;
+  final int subTotalAmount;
+  final bool productsListEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +108,8 @@ class ScreenProductsResume extends StatelessWidget {
               Text('Subtotal: ',
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
-              Text('S/. 100.00',
+              Text(
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(this.subTotalAmount, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
@@ -75,7 +120,8 @@ class ScreenProductsResume extends StatelessWidget {
               Text('Delivery: ',
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
-              Text('S/. 10.00',
+              Text(
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(0, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
@@ -86,15 +132,18 @@ class ScreenProductsResume extends StatelessWidget {
               Text('Total: ',
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
-              Text('S/. 110.00',
+              Text(
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(0, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
           ),
           UIButtonIcon(
-              onPressedFunc: () {
-                navigationModel.actualPage = 1;
-              },
+              onPressedFunc: this.productsListEmpty
+                  ? null
+                  : () {
+                      navigationModel.actualPage = 1;
+                    },
               enabledColor: AppColors.secondary60Color,
               disabledColor: AppColors.secondary40Color,
               splashColor: AppColors.gray100Color,
@@ -107,13 +156,15 @@ class ScreenProductsResume extends StatelessWidget {
 }
 
 class ScreenProductsList extends StatelessWidget {
-  const ScreenProductsList({
-    super.key,
-  });
+  final List<ShoppingCardProducts> products;
+
+  const ScreenProductsList({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final ShoppingCartBloc shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
 
     return SizedBox(
       height: size.height,
@@ -124,18 +175,29 @@ class ScreenProductsList extends StatelessWidget {
               mainAxisSpacing: 14,
               mainAxisExtent: 178,
               childAspectRatio: 20),
-          itemCount: 13,
-          itemBuilder: (BuildContext context, int index) {
-            if (index < 12) {
-              return const ProductCardShopCart(
-                productImageUrl:
-                    'https://promart.vteximg.com.br/arquivos/ids/6571809-1000-1000/image-e141cd34a31b46738915da3046190205.jpg?v=638012766471300000',
-                productTitle: 'Teclado mecánico \n Logitech',
-                productSubTitle: 'Tecnología antighosting',
-                productPrice: '5.00',
-                productTotalPrice: '50.00',
-                currencySymbol: 'S/.',
-              );
+          itemCount: products.length + 1,
+          itemBuilder: (BuildContext context, int i) {
+            if (i < products.length) {
+              return ProductCardShopCart(
+                  productImageUrl: products[i].product.cardImgUrlFo,
+                  productTitle: products[i].product.cardTitleFo,
+                  productSubTitle: products[i].product.cardSubTitleFo,
+                  productPrice: PipesDecimal.unitsToDecimal(
+                      products[i].product.inventoryPrice, 2),
+                  productTotalPrice: PipesDecimal.unitsToDecimal(
+                      products[i].product.inventoryPrice * products[i].quantity,
+                      2),
+                  productQuantity: products[i].quantity,
+                  currencySymbol: env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL,
+                  onPressedLessFunc: () {
+                    shoppingCartBloc.lessProduct(i);
+                  },
+                  onPressedPlusFunc: () {
+                    shoppingCartBloc.plusProduct(i);
+                  },
+                  onPressedRemoveFunc: () {
+                    shoppingCartBloc.removeProduct(i);
+                  });
             } else {
               return const SizedBox(
                 height: 178,

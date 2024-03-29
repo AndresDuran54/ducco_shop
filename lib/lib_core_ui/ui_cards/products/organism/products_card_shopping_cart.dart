@@ -1,10 +1,12 @@
 //+ FLUTTER
-import 'package:ducco_shop/utils/colors/colors.dart';
-import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:flutter/material.dart';
 
 //+ LIB CORE UI
-import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
+
+//+ UTILS
+import 'package:ducco_shop/utils/colors/colors.dart';
+import 'package:ducco_shop/utils/fonts/fonts.dart';
 
 class ProductCardShopCart extends StatelessWidget {
   final String productImageUrl;
@@ -12,16 +14,24 @@ class ProductCardShopCart extends StatelessWidget {
   final String productSubTitle;
   final String productPrice;
   final String productTotalPrice;
+  final int productQuantity;
   final String currencySymbol;
+  final void Function() onPressedPlusFunc;
+  final void Function() onPressedLessFunc;
+  final void Function() onPressedRemoveFunc;
 
   const ProductCardShopCart(
       {super.key,
       required this.productImageUrl,
       required this.productTitle,
       required this.productSubTitle,
-      required this.currencySymbol,
       required this.productPrice,
-      required this.productTotalPrice});
+      required this.productTotalPrice,
+      required this.productQuantity,
+      required this.currencySymbol,
+      required this.onPressedPlusFunc,
+      required this.onPressedLessFunc,
+      required this.onPressedRemoveFunc});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +76,11 @@ class ProductCardShopCart extends StatelessWidget {
             productSubTitle: this.productSubTitle,
             productPrice: this.productPrice,
             productTotalPrice: this.productTotalPrice,
+            productQuantity: this.productQuantity,
             currencySymbol: this.currencySymbol,
+            onPressedLessFunc: this.onPressedLessFunc,
+            onPressedPlusFunc: this.onPressedPlusFunc,
+            onPressedRemoveFunc: this.onPressedRemoveFunc,
           )
         ],
       ),
@@ -80,7 +94,11 @@ class ProductCardShopCartContent extends StatelessWidget {
   final String productSubTitle;
   final String productPrice;
   final String productTotalPrice;
+  final int productQuantity;
   final String currencySymbol;
+  final void Function() onPressedPlusFunc;
+  final void Function() onPressedLessFunc;
+  final void Function() onPressedRemoveFunc;
 
   const ProductCardShopCartContent(
       {super.key,
@@ -89,7 +107,11 @@ class ProductCardShopCartContent extends StatelessWidget {
       required this.productSubTitle,
       required this.currencySymbol,
       required this.productPrice,
-      required this.productTotalPrice});
+      required this.productQuantity,
+      required this.productTotalPrice,
+      required this.onPressedPlusFunc,
+      required this.onPressedLessFunc,
+      required this.onPressedRemoveFunc});
 
   @override
   Widget build(BuildContext context) {
@@ -111,99 +133,69 @@ class ProductCardShopCartContent extends StatelessWidget {
                 image: NetworkImage(this.productImageUrl)),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 16),
         Container(
           padding: const EdgeInsets.all(4),
-          child: Column(children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  this.productTitle,
-                  textAlign: TextAlign.start,
-                  style: AppFonts.labelTextHeavy(
-                      color: AppColors.secondary60Color, fontFamily: 'Ubuntu'),
-                ),
-                Text(
-                  this.productSubTitle,
-                  textAlign: TextAlign.start,
-                  style: AppFonts.captionTextHeavy(
-                      color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Precio unitario: ',
-                      textAlign: TextAlign.start,
-                      style: AppFonts.captionTextHeavy(
-                          color: AppColors.gray20Color, fontFamily: 'Ubuntu'),
-                    ),
-                    Text(
-                      '${this.currencySymbol} ${this.productPrice}',
-                      textAlign: TextAlign.start,
-                      style: AppFonts.captionTextHeavy(
-                          color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
-                    )
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Precio total: ',
-                      textAlign: TextAlign.start,
-                      style: AppFonts.captionTextHeavy(
-                          color: AppColors.gray20Color, fontFamily: 'Ubuntu'),
-                    ),
-                    Text(
-                      '${this.currencySymbol} ${this.productTotalPrice}',
-                      textAlign: TextAlign.start,
-                      style: AppFonts.captionTextHeavy(
-                          color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                UIButtonMiniIcon(
-                    onTapFunction: () => {},
-                    backgroundColor: AppColors.primary20Color,
-                    color: AppColors.gray100Color,
-                    iconData: Icons.add,
-                    backgroundOpacity: 1),
-                const SizedBox(width: 12),
-                Text(
-                  '5',
-                  textAlign: TextAlign.start,
-                  style: AppFonts.subTitleHeavy(
-                      color: AppColors.gray30Color, fontFamily: 'Ubuntu'),
-                ),
-                const SizedBox(width: 12),
-                UIButtonMiniIcon(
-                    onTapFunction: () => {},
-                    backgroundColor: AppColors.primary20Color,
-                    color: AppColors.gray100Color,
-                    iconData: Icons.remove,
-                    backgroundOpacity: 1),
-                const SizedBox(width: 12),
-                UIButtonMiniIcon(
-                    onTapFunction: () => {},
-                    backgroundColor: AppColors.red60Color,
-                    color: AppColors.gray100Color,
-                    iconData: Icons.delete,
-                    backgroundOpacity: 1)
-              ],
-            )
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                this.productTitle,
+                textAlign: TextAlign.start,
+                style: AppFonts.labelTextHeavy(
+                    color: AppColors.secondary60Color, fontFamily: 'Ubuntu'),
+              ),
+              Text(
+                this.productSubTitle,
+                textAlign: TextAlign.start,
+                style: AppFonts.captionTextHeavy(
+                    color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Precio unitario: ',
+                    textAlign: TextAlign.start,
+                    style: AppFonts.captionTextHeavy(
+                        color: AppColors.gray20Color, fontFamily: 'Ubuntu'),
+                  ),
+                  Text(
+                    '${this.currencySymbol} ${this.productPrice}',
+                    textAlign: TextAlign.start,
+                    style: AppFonts.captionTextHeavy(
+                        color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
+                  )
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Precio total: ',
+                    textAlign: TextAlign.start,
+                    style: AppFonts.captionTextHeavy(
+                        color: AppColors.gray20Color, fontFamily: 'Ubuntu'),
+                  ),
+                  Text(
+                    '${this.currencySymbol} ${this.productTotalPrice}',
+                    textAlign: TextAlign.start,
+                    style: AppFonts.captionTextHeavy(
+                        color: AppColors.gray40Color, fontFamily: 'Ubuntu'),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              CoreUIInputSlider(
+                  productQuantity: productQuantity,
+                  onPressedLessFunc: this.onPressedLessFunc,
+                  onPressedPlusFunc: this.onPressedPlusFunc,
+                  onPressedRemoveFunc: this.onPressedRemoveFunc)
+            ],
+          ),
         )
       ]),
     );
