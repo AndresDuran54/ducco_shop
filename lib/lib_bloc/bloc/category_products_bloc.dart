@@ -17,7 +17,11 @@ class CategoryProductsBloc
 
   CategoryProductsBloc()
       : super(CategoryProductsLoadingState(
-            pagingIndex: 1, pagingSize: 10, itemsCounter: 12)) {
+          filters: [],
+          orders: [],
+          itemsCounter: 0,
+          pagingSize: 10,
+        )) {
     //+ CategoryProductsInitEvent
     on<CategoryProductsInitEvent>(
         (CategoryProductsInitEvent event, Emitter<CategoryProductsState> emit) {
@@ -26,32 +30,48 @@ class CategoryProductsBloc
           filters: event.filters!,
           itemsCounter: event.itemsCounter!,
           orders: event.orders!,
-          pagingIndex: state.pagingIndex!,
-          pagingSize: state.pagingSize!,
+          pagingIndex: event.pagingIndex!,
+          pagingSize: event.pagingSize!,
           products: event.products!));
     });
 
-    //+ CategoryProductsInitEvent
+    //+ CategoryProductsChangePagingEvent
     on<CategoryProductsChangePagingEvent>(
         (CategoryProductsChangePagingEvent event,
             Emitter<CategoryProductsState> emit) {
       //+ Emitimos el nuevo evento
       emit(CategoryProductsPackedState(
           filters: state.filters!,
-          itemsCounter: state.itemsCounter!,
           orders: state.orders!,
+          itemsCounter: state.itemsCounter!,
           pagingIndex: event.pagingIndex!,
           pagingSize: state.pagingSize!,
           products: event.products!));
+    });
+
+    //+ CategoryProductsLoadingEvent
+    on<CategoryProductsLoadingEvent>((CategoryProductsLoadingEvent event,
+        Emitter<CategoryProductsState> emit) {
+      //+ Emitimos el nuevo evento
+      emit(CategoryProductsLoadingState(
+        filters: event.filters!,
+        orders: event.orders!,
+        itemsCounter: event.itemsCounter!,
+        pagingSize: event.pagingSize!,
+      ));
     });
   }
 
   //+ Método para inicializar la vista
   void initView(int categoryId) async {
     try {
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsLoadingEvent(
+          filters: [], orders: [], itemsCounter: 0, pagingSize: 10));
+
       //+ Construimos el filtro inicial
       final List<Map<String, String>> filters = [
-        {"filter": "categoryId", "val": "$categoryId"}
+        {'"filter"': '"categoryId"', '"val"': '"$categoryId"'}
       ];
 
       //+ Construimos el order inicial
@@ -62,8 +82,8 @@ class CategoryProductsBloc
           await this.productService.productsGetItems(headers: {
         'filters': filters.toString(),
         'orders': orders.toString(),
-        'paging_index': state.pagingIndex.toString(),
-        'paging_size': state.pagingSize.toString(),
+        'paging_index': '1',
+        'paging_size': '10',
       });
 
       //+ Mandamos el evento para inicializar la vista
@@ -72,8 +92,8 @@ class CategoryProductsBloc
         orders: orders,
         products: productsItems.items,
         itemsCounter: productsItems.itemsCounterTotal,
-        pagingIndex: state.pagingIndex!,
-        pagingSize: state.pagingSize!,
+        pagingIndex: 1,
+        pagingSize: 10,
       ));
     } catch (err) {
       //+ Mandamos el evento de error
@@ -84,6 +104,14 @@ class CategoryProductsBloc
   //+ Método para cambiar la paginación
   void changePagination(int pagingIndex) async {
     try {
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsLoadingEvent(
+        filters: state.filters!,
+        orders: state.orders!,
+        itemsCounter: state.itemsCounter!,
+        pagingSize: state.pagingSize!,
+      ));
+
       //+ Obtenemos los registros de productos
       ProductsGetItems productsItems =
           await this.productService.productsGetItems(headers: {

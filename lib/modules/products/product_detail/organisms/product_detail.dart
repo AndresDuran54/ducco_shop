@@ -55,6 +55,7 @@ class ProductDetailScreen extends StatelessWidget {
                     Column(
                       children: <Widget>[
                         Text(shoppingCardProducts.product.detailTitleFo,
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
                                 fontFamily: 'Roboto',
                                 fontWeight: FontWeight.w500,
@@ -63,7 +64,7 @@ class ProductDetailScreen extends StatelessWidget {
                         Text(shoppingCardProducts.product.detailSubTitleFo,
                             style: const TextStyle(
                                 fontFamily: 'Roboto',
-                                fontWeight: FontWeight.w300,
+                                fontWeight: FontWeight.w400,
                                 fontSize: 16,
                                 color: AppColors.gray40Color)),
                       ],

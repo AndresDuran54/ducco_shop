@@ -17,28 +17,12 @@ class CategoryProductsState {
 
   //+ Constructor
   CategoryProductsState(
-      {required this.products,
-      required this.itemsCounter,
-      required this.filters,
-      required this.orders,
-      required this.pagingIndex,
-      required this.pagingSize});
-}
-
-//+ Estado que los products están cargando
-class CategoryProductsLoadingState extends CategoryProductsState {
-  //+ Constructor
-  CategoryProductsLoadingState({
-    required int pagingIndex,
-    required int pagingSize,
-    required int itemsCounter,
-  }) : super(
-            products: [],
-            itemsCounter: itemsCounter,
-            filters: [],
-            orders: [],
-            pagingIndex: pagingIndex,
-            pagingSize: pagingSize);
+      {this.products,
+      this.itemsCounter,
+      this.filters,
+      this.orders,
+      this.pagingIndex,
+      this.pagingSize});
 }
 
 //+ Estado que indica los products ya cargaron
@@ -57,5 +41,21 @@ class CategoryProductsPackedState extends CategoryProductsState {
             filters: filters,
             orders: orders,
             pagingIndex: pagingIndex,
+            pagingSize: pagingSize);
+}
+
+//+ Estado que indica los products se están cargaron
+class CategoryProductsLoadingState extends CategoryProductsState {
+  //+ Constructor
+  //+ Constructor
+  CategoryProductsLoadingState({
+    required List<Map<String, String>> filters,
+    required List<Map<String, String>> orders,
+    required int itemsCounter,
+    required int pagingSize,
+  }) : super(
+            itemsCounter: itemsCounter,
+            filters: filters,
+            orders: orders,
             pagingSize: pagingSize);
 }

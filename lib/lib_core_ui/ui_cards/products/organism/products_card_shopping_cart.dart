@@ -8,6 +8,9 @@ import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
 
+//+ LIB CORE DOMAIN
+import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
+
 class ProductCardShopCart extends StatelessWidget {
   final String productImageUrl;
   final String productTitle;
@@ -140,7 +143,7 @@ class ProductCardShopCartContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                this.productTitle,
+                PipesString.stringShort(this.productTitle, 23),
                 textAlign: TextAlign.start,
                 style: AppFonts.labelTextHeavy(
                     color: AppColors.secondary60Color, fontFamily: 'Ubuntu'),

@@ -66,6 +66,21 @@ class CategoryProductsChangeOrdersEvent extends CategoryProductsEvent {
       : super(products: products, filters: filters, orders: orders);
 }
 
+//+ Evento para indicar que los productos se estánc cargando
+class CategoryProductsLoadingEvent extends CategoryProductsEvent {
+  //+ Constructor
+  CategoryProductsLoadingEvent({
+    required List<Map<String, String>> filters,
+    required List<Map<String, String>> orders,
+    required int itemsCounter,
+    required int pagingSize,
+  }) : super(
+            filters: filters,
+            orders: orders,
+            itemsCounter: itemsCounter,
+            pagingSize: pagingSize);
+}
+
 //+ Evento para indicar que ocurrio un error
 class CategoryProductsErrorEvent extends CategoryProductsEvent {
   //+ Constructor

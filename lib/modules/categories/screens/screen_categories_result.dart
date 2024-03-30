@@ -33,18 +33,42 @@ class ScreenCategoriesResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //+ Dimensiones de pantalla
     final Size size = MediaQuery.of(context).size;
+    //+ Bloc de categorías
     final CategoryProductsBloc categoryProductsBloc =
         BlocProvider.of<CategoryProductsBloc>(context);
+    //+ Controlador de navegación
+    final navigationModel = Provider.of<NavigationModel>(context);
+    //+ Obtenemos el registro de la categoría
+    final Category category = navigationModel.paramsPage['category'];
 
     //+ Inicializamos la vista
-    categoryProductsBloc.initView(1);
+    categoryProductsBloc.initView(category.categoryId);
 
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Column(
         children: <Widget>[
-          const ScreenCategoriesResultHeader(),
+          BlocBuilder<CategoryProductsBloc, CategoryProductsState>(
+            builder: (BuildContext context, CategoryProductsState state) {
+              if (state is CategoryProductsLoadingState) {
+                return ScreenCategoriesResultHeader(
+                  itemsCounter: state.itemsCounter!,
+                  category: category,
+                );
+              } else if (state is CategoryProductsPackedState) {
+                return ScreenCategoriesResultHeader(
+                  itemsCounter: state.itemsCounter!,
+                  category: category,
+                );
+              }
+              return ScreenCategoriesResultHeader(
+                itemsCounter: state.itemsCounter!,
+                category: category,
+              );
+            },
+          ),
           const SizedBox(
             height: 8,
           ),
@@ -52,14 +76,14 @@ class ScreenCategoriesResult extends StatelessWidget {
             child: BlocBuilder<CategoryProductsBloc, CategoryProductsState>(
               builder: (BuildContext context, CategoryProductsState state) {
                 if (state is CategoryProductsLoadingState) {
-                  return ScreenCategoriesResultBody(
-                      size: size, products: state.products!);
+                  return ScreenCategoriesLoadingBody(
+                    size: size,
+                  );
                 } else if (state is CategoryProductsPackedState) {
                   return ScreenCategoriesResultBody(
                       size: size, products: state.products!);
                 }
-                return ScreenCategoriesResultBody(
-                    size: size, products: state.products!);
+                return Container();
               },
             ),
           ),
@@ -67,9 +91,10 @@ class ScreenCategoriesResult extends StatelessWidget {
             height: 8,
           ),
           ScreenCategoriesResultPaginator(
-              size: size,
-              categoryProductsBloc: categoryProductsBloc,
-              itemsCounter: 25)
+            size: size,
+            categoryProductsBloc: categoryProductsBloc,
+            itemsCounter: categoryProductsBloc.state.itemsCounter!,
+          )
         ],
       ),
     );
@@ -102,6 +127,32 @@ class ScreenCategoriesResultBody extends StatelessWidget {
                 size: size,
                 product: products[i],
               )),
+    );
+  }
+}
+
+class ScreenCategoriesLoadingBody extends StatelessWidget {
+  final Size size;
+
+  const ScreenCategoriesLoadingBody({
+    super.key,
+    required this.size,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 400,
+      child: GridView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: 6,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              mainAxisExtent: 300),
+          itemBuilder: (BuildContext context, int i) =>
+              const AnimatedLoadingCard()),
     );
   }
 }
@@ -157,7 +208,7 @@ class _ScreenCategoriesResultPaginatorState
               (state.itemsCounter! > 3 ? 3 : state.itemsCounter!);
 
           //+ Calculamos el número de paginadores
-          this.pagingsCount = (state.itemsCounter! / 10).round();
+          this.pagingsCount = (state.itemsCounter! / 10).ceil();
         }
       });
     });
@@ -273,9 +324,11 @@ class _ScreenCategoriesResultPaginatorState
 }
 
 class ScreenCategoriesResultHeader extends StatelessWidget {
-  const ScreenCategoriesResultHeader({
-    super.key,
-  });
+  final int itemsCounter;
+  final Category category;
+
+  const ScreenCategoriesResultHeader(
+      {super.key, required this.itemsCounter, required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +351,7 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
                       color: AppColors.gray85Color, fontFamily: 'Ubuntu'),
                 ),
                 Text(
-                  'Resultados (5588)',
+                  'Resultados (${this.itemsCounter})',
                   style: AppFonts.mainTextHeavy(
                       color: AppColors.gray85Color, fontFamily: 'Ubuntu'),
                 )
@@ -320,7 +373,8 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
                           context: context,
                           builder: (BuildContext context) =>
                               SingleChildScrollView(
-                                  child: UIAccordion(
+                                  child: UIAccordionFilters(
+                                filters: this.category.cardFiltersFo,
                                 onPressedFunc: () => {Navigator.pop(context)},
                               )))
                     },
@@ -379,5 +433,63 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class AnimatedLoadingCard extends StatefulWidget {
+  const AnimatedLoadingCard({
+    super.key,
+  });
+
+  @override
+  State<AnimatedLoadingCard> createState() => _AnimatedLoadingCardState();
+}
+
+class _AnimatedLoadingCardState extends State<AnimatedLoadingCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800), // Duración de la animación
+    );
+    _animation = ColorTween(
+      begin: AppColors.gray45Color,
+      end: AppColors.black30Color,
+    ).animate(_controller);
+    _controller.repeat(reverse: true); // Repetir la animación de ida y vuelta
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (BuildContext context, _) {
+        return Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  _animation.value!
+                      .withOpacity(0.5), // Color del fondo con opacidad
+                  _animation.value!.withOpacity(0.75),
+                  _animation.value!, // Color del fondo
+                ],
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(4))),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Liberar recursos al finalizar
+    super.dispose();
   }
 }

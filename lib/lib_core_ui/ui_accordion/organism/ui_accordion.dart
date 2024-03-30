@@ -7,34 +7,26 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 
 //+ LIB CORE UI
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 
-class UIAccordion extends StatefulWidget {
+//+ LIB CORE DOMAIN
+import 'package:ducco_shop/lib_core_domain/module.dart';
+
+class UIAccordionFilters extends StatefulWidget {
+  final List<CategoryFilter> filters;
   final void Function()? onPressedFunc;
 
-  const UIAccordion({
+  const UIAccordionFilters({
     super.key,
     required this.onPressedFunc,
+    required this.filters,
   });
 
   @override
-  State<UIAccordion> createState() => _UIAccordionState();
+  State<UIAccordionFilters> createState() => _UIAccordionFiltersState();
 }
 
-class _UIAccordionState extends State<UIAccordion> {
-  final List<AccordionSection> itemsExpansionPanel =
-      List<AccordionSection>.generate(7, (int i) {
-    return AccordionSection(
-        title: 'Marca',
-        expanded: false,
-        options: List.from([
-          AccordionSectionOption(id: '1', label: 'Huawei', selected: false),
-          AccordionSectionOption(id: '1', label: 'Samsung', selected: true),
-          AccordionSectionOption(id: '1', label: 'Alcacel', selected: false),
-          AccordionSectionOption(id: '1', label: 'Apple', selected: false),
-          AccordionSectionOption(id: '1', label: 'Xiaomi', selected: true),
-        ]));
-  });
-
+class _UIAccordionFiltersState extends State<UIAccordionFilters> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -49,11 +41,11 @@ class _UIAccordionState extends State<UIAccordion> {
             expandedHeaderPadding: const EdgeInsets.all(0),
             expansionCallback: (int i, bool expanded) {
               setState(() {
-                itemsExpansionPanel[i].expanded = !expanded;
+                widget.filters[i].expanded = !expanded;
               });
             },
-            children: itemsExpansionPanel
-                .map<ExpansionPanel>((AccordionSection accordionSection) {
+            children: widget.filters
+                .map<ExpansionPanel>((CategoryFilter accordionSection) {
               return ExpansionPanel(
                 backgroundColor: AppColors.gray25Color,
                 headerBuilder: (BuildContext context, bool isExpanded) {
@@ -65,22 +57,17 @@ class _UIAccordionState extends State<UIAccordion> {
                   );
                 },
                 body: ListTile(
-                    contentPadding: const EdgeInsets.only(bottom: 0, left: 40),
-                    title: SizedBox(
-                      height: (accordionSection.options.length * 25) +
-                          ((accordionSection.options.length) * 15),
-                      child: ListView.separated(
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (BuildContext context, int i) =>
-                              UIAccordionSectionOption(
-                                  accordionSectionOption:
-                                      accordionSection.options[i]),
-                          separatorBuilder: (BuildContext context, int i) =>
-                              const SizedBox(
-                                height: 15,
-                              ),
-                          itemCount: accordionSection.options.length),
-                    )),
+                    title: accordionSection.type == 'input_select'
+                        ? SizedBox(
+                            height: (accordionSection.options.length * 25) +
+                                ((accordionSection.options.length) * 15),
+                            child: UIAccordionFilterIn(
+                              categoryFilter: accordionSection,
+                            ),
+                          )
+                        : UIAccordionFilterBetween(
+                            categoryFilter: accordionSection,
+                          )),
                 isExpanded: accordionSection.expanded,
               );
             }).toList(),
@@ -97,8 +84,72 @@ class _UIAccordionState extends State<UIAccordion> {
   }
 }
 
+class UIAccordionFilterIn extends StatelessWidget {
+  final CategoryFilter categoryFilter;
+
+  const UIAccordionFilterIn({
+    super.key,
+    required this.categoryFilter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 0, left: 20),
+      child: ListView.separated(
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (BuildContext context, int i) =>
+              UIAccordionSectionOption(
+                  accordionSectionOption: categoryFilter.options[i]),
+          separatorBuilder: (BuildContext context, int i) => const SizedBox(
+                height: 15,
+              ),
+          itemCount: categoryFilter.options.length),
+    );
+  }
+}
+
+class UIAccordionFilterBetween extends StatelessWidget {
+  final CategoryFilter categoryFilter;
+
+  const UIAccordionFilterBetween({
+    super.key,
+    required this.categoryFilter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      child: Column(
+        children: <Widget>[
+          CoreUIInputText(
+            labelText: categoryFilter.options[0].label,
+            textInputType: TextInputType.number,
+            validators: [
+              AppInputTextValidators.checkRequired(errorMsg: 'Campo requerido'),
+              AppInputTextValidators.checkNumber(
+                  errorMsg: 'Verifica que sea un número'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          CoreUIInputText(
+            labelText: categoryFilter.options[1].label,
+            textInputType: TextInputType.number,
+            validators: [
+              AppInputTextValidators.checkRequired(errorMsg: 'Campo requerido'),
+              AppInputTextValidators.checkNumber(
+                  errorMsg: 'Verifica que sea un número'),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class UIAccordionSectionOption extends StatefulWidget {
-  final AccordionSectionOption accordionSectionOption;
+  final CategoryFilterOption accordionSectionOption;
   const UIAccordionSectionOption(
       {super.key, required this.accordionSectionOption});
 
@@ -143,25 +194,4 @@ class _UIAccordionSectionOptionState extends State<UIAccordionSectionOption> {
       ),
     );
   }
-}
-
-class AccordionSection {
-  final String title;
-  final List<AccordionSectionOption> options;
-  bool expanded;
-
-  AccordionSection({
-    required this.title,
-    required this.options,
-    required this.expanded,
-  });
-}
-
-class AccordionSectionOption {
-  final String id;
-  final String label;
-  bool selected;
-
-  AccordionSectionOption(
-      {required this.id, required this.label, required this.selected});
 }
