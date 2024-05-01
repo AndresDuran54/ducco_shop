@@ -7,16 +7,20 @@ import 'package:flutter/services.dart';
 
 class CoreUIInputText extends StatefulWidget {
   final String labelText;
-  final String defaultText;
   final List<String? Function({required String value})> validators;
   final TextInputType textInputType;
+  final TextEditingController textEditingController;
+  static final TextEditingController defaultTextEditingController =
+      TextEditingController();
 
-  const CoreUIInputText(
+  CoreUIInputText(
       {super.key,
       required this.labelText,
+      TextEditingController? textEditingController,
       this.validators = const [],
-      this.textInputType = TextInputType.text,
-      this.defaultText = ''});
+      this.textInputType = TextInputType.text})
+      : textEditingController =
+            textEditingController ?? defaultTextEditingController;
 
   @override
   State<CoreUIInputText> createState() => _CoreUIInputTextState();
@@ -67,7 +71,7 @@ class _CoreUIInputTextState extends State<CoreUIInputText> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: formKey,
-      initialValue: this.widget.defaultText,
+      controller: this.widget.textEditingController,
       keyboardType: this.widget.textInputType,
       inputFormatters: [
         if (this.widget.textInputType == TextInputType.number)

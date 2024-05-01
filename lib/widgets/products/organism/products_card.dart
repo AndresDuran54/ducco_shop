@@ -85,7 +85,7 @@ class ProductCard extends StatelessWidget {
                   SizedBox(
                     width: size.width - 20,
                     child: Text(
-                      '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(product.inventoryPrice, 2)}',
+                      '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(product.inventoryPrice, 2)}',
                       style: AppFonts.mainTextHeavy(
                           color: AppColors.black100Color, fontFamily: 'Ubuntu'),
                       textAlign: TextAlign.start,

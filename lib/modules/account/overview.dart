@@ -1,8 +1,11 @@
+import 'package:ducco_shop/lib_bloc/bloc/customer_bloc.dart';
+import 'package:ducco_shop/lib_bloc/state/customer_state.dart';
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountOverview extends StatelessWidget {
   //+ Lista de tipos de documentos de identidad
@@ -19,19 +22,223 @@ class AccountOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: ListView(
+      child: BlocBuilder<CustomerBloc, CustomerState>(
+          builder: (BuildContext context, CustomerState state) {
+        if (!state.loggedIn) {
+          return ListView(
+            children: <Widget>[
+              const NewProfileInformationCard(),
+              const SizedBox(
+                height: 20,
+              ),
+              UIButton(
+                onPressedFunc: () {},
+                enabledColor: AppColors.secondary80Color,
+                disabledColor: AppColors.secondary20Color,
+                splashColor: AppColors.gray70Color,
+                width: double.infinity,
+                text: 'Iniciar sesión',
+                textStyle: AppFonts.subTitle2Heavy(
+                    color: AppColors.gray100Color, fontFamily: 'Ubuntu'),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              NewProfileInformationDataForm(documentOptions: documentOptions),
+            ],
+          );
+        }
+        return ListView(
+          children: <Widget>[
+            const MyProfileInformationCard(),
+            const SizedBox(
+              height: 20,
+            ),
+            MyProfileInformationDataForm(documentOptions: documentOptions),
+            const SizedBox(
+              height: 20,
+            ),
+            MyProfileInformationPasswordForm(documentOptions: documentOptions),
+          ],
+        );
+      }),
+    );
+  }
+}
+
+class NewProfileInformationDataForm extends StatelessWidget {
+  const NewProfileInformationDataForm({
+    super.key,
+    required this.documentOptions,
+  });
+
+  final List<DropdownMenuItem<String>> documentOptions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: const BoxDecoration(
+          color: AppColors.gray100Color,
+          borderRadius: BorderRadius.all(Radius.circular(8))),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const MyProfileInformationCard(),
-          const SizedBox(
-            height: 20,
+          Text(
+            'Crea tu cuenta',
+            textAlign: TextAlign.start,
+            style: AppFonts.subTitle2Heavy(
+                color: AppColors.black20Color, fontFamily: 'Ubuntu'),
           ),
-          MyProfileInformationDataForm(documentOptions: documentOptions),
-          const SizedBox(
-            height: 20,
+          const SizedBox(height: 8),
+          //+ Tipo de identificación
+          SizedBox(
+              height: 60,
+              child: CoreUIInputSelect(
+                optionsList: this.documentOptions,
+                value: "DNI",
+                labelText: 'Tipo de documento',
+              )),
+          const SizedBox(height: 14),
+          //+ Identificación
+          CoreUIInputText(
+            labelText: 'Identificación',
+            textInputType: TextInputType.number,
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'La identificación es requerida')
+            ],
           ),
-          MyProfileInformationPasswordForm(documentOptions: documentOptions),
+          const SizedBox(height: 14),
+          //+ Correo electrónico
+          CoreUIInputText(labelText: 'Correo electrónico', validators: [
+            AppInputTextValidators.checkRequired(
+                errorMsg: 'El correo electrónico es requerido'),
+            AppInputTextValidators.checkEmail(
+                errorMsg: 'Ingrese un formato de correo correcto'),
+          ]),
+          const SizedBox(height: 14),
+          //+ Nombres
+          CoreUIInputText(
+            labelText: 'Nombres',
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'Los nombres son requeridos'),
+              AppInputTextValidators.checkText(
+                  errorMsg: 'Los nombres solo deben contener letras')
+            ],
+          ),
+          const SizedBox(height: 14),
+          //+ Apellidos
+          CoreUIInputText(
+            labelText: 'Apellidos',
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'Los apellidos son requeridos'),
+              AppInputTextValidators.checkText(
+                  errorMsg: 'Los apellidos solo deben contener letras')
+            ],
+          ),
+          const SizedBox(height: 14),
+          //+ Número celular
+          CoreUIInputText(
+            labelText: 'Número celular',
+            textInputType: TextInputType.number,
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'El número celular es requerido')
+            ],
+          ),
+          const SizedBox(height: 16),
+          //+ Nueva contraseña
+          CoreUIInputText(
+            labelText: 'Contraseña',
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'La contraseña actual es requerida'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          //+ Confirmar contraseña
+          CoreUIInputText(
+            labelText: 'Confirmar contraseña',
+            validators: [
+              AppInputTextValidators.checkRequired(
+                  errorMsg: 'La contraseña actual es requerida'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          UIButton(
+            onPressedFunc: () {},
+            enabledColor: AppColors.secondary80Color,
+            disabledColor: AppColors.secondary20Color,
+            splashColor: AppColors.gray70Color,
+            width: double.infinity,
+            text: 'Crear',
+            textStyle: AppFonts.subTitle2Heavy(
+                color: AppColors.gray100Color, fontFamily: 'Ubuntu'),
+          )
         ],
       ),
+    );
+  }
+}
+
+class NewProfileInformationCard extends StatelessWidget {
+  const NewProfileInformationCard({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: const BoxDecoration(
+          color: AppColors.gray100Color,
+          borderRadius: BorderRadius.all(Radius.circular(8))),
+      child:
+          Row(crossAxisAlignment: CrossAxisAlignment.center, children: <Widget>[
+        Container(
+          height: 100,
+          width: 100,
+          decoration: const BoxDecoration(
+              color: AppColors.blue100Color,
+              borderRadius: BorderRadius.all(Radius.circular(100))),
+          child: Center(
+            child: Text(
+              'DC',
+              textAlign: TextAlign.start,
+              style: AppFonts.bigTitleHeavy(
+                  color: AppColors.gray100Color, fontFamily: 'Roboto'),
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 16,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Crea una nueva cuenta',
+              textAlign: TextAlign.start,
+              style: AppFonts.subTitle2Heavy(
+                  color: AppColors.black20Color, fontFamily: 'Ubuntu'),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(
+              'Si ya tienes una, inicia sesión',
+              textAlign: TextAlign.start,
+              style: AppFonts.labelTextLight(
+                  color: AppColors.black20Color, fontFamily: 'Ubuntu'),
+            )
+          ],
+        ),
+      ]),
     );
   }
 }
@@ -74,7 +281,6 @@ class MyProfileInformationDataForm extends StatelessWidget {
           //+ Identificación
           CoreUIInputText(
             labelText: 'Identificación',
-            defaultText: '73525810',
             textInputType: TextInputType.number,
             validators: [
               AppInputTextValidators.checkRequired(
@@ -83,20 +289,16 @@ class MyProfileInformationDataForm extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           //+ Correo electrónico
-          CoreUIInputText(
-              labelText: 'Correo electrónico',
-              defaultText: 'andres_angeles@hotmail.es',
-              validators: [
-                AppInputTextValidators.checkRequired(
-                    errorMsg: 'El correo electrónico es requerido'),
-                AppInputTextValidators.checkEmail(
-                    errorMsg: 'Ingrese un formato de correo correcto'),
-              ]),
+          CoreUIInputText(labelText: 'Correo electrónico', validators: [
+            AppInputTextValidators.checkRequired(
+                errorMsg: 'El correo electrónico es requerido'),
+            AppInputTextValidators.checkEmail(
+                errorMsg: 'Ingrese un formato de correo correcto'),
+          ]),
           const SizedBox(height: 14),
           //+ Nombres
           CoreUIInputText(
             labelText: 'Nombres',
-            defaultText: 'Andrés Ángel',
             validators: [
               AppInputTextValidators.checkRequired(
                   errorMsg: 'Los nombres son requeridos'),
@@ -108,7 +310,6 @@ class MyProfileInformationDataForm extends StatelessWidget {
           //+ Apellidos
           CoreUIInputText(
             labelText: 'Apellidos',
-            defaultText: 'Duran Ccota',
             validators: [
               AppInputTextValidators.checkRequired(
                   errorMsg: 'Los apellidos son requeridos'),
@@ -120,7 +321,6 @@ class MyProfileInformationDataForm extends StatelessWidget {
           //+ Número celular
           CoreUIInputText(
             labelText: 'Número celular',
-            defaultText: '981193476',
             textInputType: TextInputType.number,
             validators: [
               AppInputTextValidators.checkRequired(
@@ -182,7 +382,6 @@ class MyProfileInformationPasswordForm extends StatelessWidget {
           //+ Contraseña nueva
           CoreUIInputText(
             labelText: 'Contraseña nueva',
-            defaultText: '',
             validators: [
               AppInputTextValidators.checkRequired(
                   errorMsg: 'La contraseña nueva es requerida'),

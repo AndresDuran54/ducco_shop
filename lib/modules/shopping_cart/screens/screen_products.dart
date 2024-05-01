@@ -109,7 +109,7 @@ class ScreenProductsResume extends StatelessWidget {
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
               Text(
-                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(this.subTotalAmount, 2)}',
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(this.subTotalAmount, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
@@ -121,7 +121,7 @@ class ScreenProductsResume extends StatelessWidget {
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
               Text(
-                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(0, 2)}',
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(0, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
@@ -133,7 +133,7 @@ class ScreenProductsResume extends StatelessWidget {
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
               Text(
-                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(0, 2)}',
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(0, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],
@@ -182,9 +182,9 @@ class ScreenProductsList extends StatelessWidget {
                   productImageUrl: products[i].product.cardImgUrlFo,
                   productTitle: products[i].product.cardTitleFo,
                   productSubTitle: products[i].product.cardSubTitleFo,
-                  productPrice: PipesDecimal.unitsToDecimal(
+                  productPrice: PipesNumber.unitsToDecimal(
                       products[i].product.inventoryPrice, 2),
-                  productTotalPrice: PipesDecimal.unitsToDecimal(
+                  productTotalPrice: PipesNumber.unitsToDecimal(
                       products[i].product.inventoryPrice * products[i].quantity,
                       2),
                   productQuantity: products[i].quantity,

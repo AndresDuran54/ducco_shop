@@ -8,8 +8,14 @@ class GetResponse {
   const GetResponse({required this.body});
 }
 
+class PostResponse {
+  final Map<String, dynamic> body;
+
+  const PostResponse({required this.body});
+}
+
 class HttpClientService {
-  //+ Instacia de dio
+  //+ Instancia de dio
   // late Dio _dio;
 
   //+ Constructor nombrado
@@ -28,7 +34,7 @@ class HttpClientService {
   ///
   /// [url] La URL a la que se realizará la solicitud.
   /// [queryParameters] Parámetros de consulta opcionales para la solicitud.
-  /// [headers] Headerss de consulta opcionales para la solicitud.
+  /// [headers] Headers de consulta opcionales para la solicitud.
   // Future<Response> _get(String url,
   //     {Map<String, dynamic>? queryParameters,
   //     Map<String, dynamic>? headers}) async {
@@ -47,7 +53,7 @@ class HttpClientService {
   ///
   /// [url] La URL a la que se realizará la solicitud.
   /// [queryParameters] Parámetros de consulta opcionales para la solicitud.
-  /// [headers] Headerss de consulta opcionales para la solicitud.
+  /// [headers] Headers de consulta opcionales para la solicitud.
   Future<GetResponse> get(String url,
       {Map<String, String>? queryParameters,
       Map<String, String>? headers}) async {
@@ -62,26 +68,32 @@ class HttpClientService {
     }
   }
 
-  // /// Realiza una solicitud POST a la URL especificada con los datos proporcionados.
-  // ///
-  // /// [url] La URL a la que se realizará la solicitud POST.
-  // /// [data] Los datos que se enviarán en el cuerpo de la solicitud.
-  // /// [headers] Headerss de consulta opcionales para la solicitud.
-  // Future<Response> post(String url,
-  //     {Map<String, dynamic>? data, Map<String, dynamic>? headers}) async {
-  //   try {
-  //     return await _dio.post(url,
-  //         data: data, options: Options(headers: headers));
-  //   } catch (e) {
-  //     throw Exception(e);
-  //   }
-  // }
+  /// Realiza una solicitud POST a la URL especificada con los datos proporcionados.
+  ///
+  /// [url] La URL a la que se realizará la solicitud POST.
+  /// [data] Los datos que se enviarán en el cuerpo de la solicitud.
+  /// [headers] Headers de consulta opcionales para la solicitud.
+  Future<PostResponse> post(String url,
+      {Map<String, String>? queryParameters,
+      Map<String, String>? headers,
+      Map<String, String>? body}) async {
+    try {
+      //+ Ejecutamos la request
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
+
+      //+ Parseamos la request
+      return PostResponse(body: json.decode(response.body));
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 
   // /// Realiza una solicitud PATCH a la URL especificada con los datos proporcionados.
   // ///
   // /// [url] La URL a la que se realizará la solicitud PATCH.
   // /// [data] Los datos que se enviarán en el cuerpo de la solicitud.
-  // /// [headers] Headerss de consulta opcionales para la solicitud.
+  // /// [headers] Headers de consulta opcionales para la solicitud.
   // Future<Response> patch(String url,
   //     {Map<String, dynamic>? data, Map<String, dynamic>? headers}) async {
   //   try {

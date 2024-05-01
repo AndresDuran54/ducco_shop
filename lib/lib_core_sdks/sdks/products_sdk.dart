@@ -6,7 +6,7 @@ import 'package:ducco_shop/lib_core_sdks/entities/products.sdk.dart';
 import 'package:ducco_shop/lib_shares/services/http-client.service.dart';
 
 class ProductsSDKService {
-  //+ Instacia de dio
+  //+ Instancia de dio
   static final HttpClientService _httpClientService =
       HttpClientService.httpClientService;
 

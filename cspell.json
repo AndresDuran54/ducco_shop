@@ -6,11 +6,18 @@
   // words - list of words to be always considered correct
   "words": [
     "Braah",
+    "desuscribimos",
     "gifs",
+    "microservicio",
+    "paginación",
+    "paginador",
+    "paginadores",
+    "Parseamos",
     "poppins",
     "roboto",
     "Setteamos",
     "signika",
+    "Subscripción",
     "Yape"
   ],
   // flagWords - list of words to be always considered incorrect

@@ -2,8 +2,8 @@ import 'package:ducco_shop/lib_core_domain/entities/products_domain.dart';
 
 //+ Clase padre para los eventos
 abstract class CategoryProductsEvent {
-  List<Map<String, String>>? filters;
-  List<Map<String, String>>? orders;
+  String? filters;
+  String? orders;
   List<Product>? products;
   int? itemsCounter;
   int? pagingIndex;
@@ -21,15 +21,18 @@ abstract class CategoryProductsEvent {
 
 //+ Evento para indicar que se debe de inciar la obtención de productos
 class CategoryProductsInitEvent extends CategoryProductsEvent {
+  int categoryId;
+
   //+ Constructor
-  CategoryProductsInitEvent({
-    required List<Map<String, String>> filters,
-    required List<Map<String, String>> orders,
-    required List<Product> products,
-    required int itemsCounter,
-    required int pagingIndex,
-    required int pagingSize,
-  }) : super(
+  CategoryProductsInitEvent(
+      {required String filters,
+      required String orders,
+      required List<Product> products,
+      required int itemsCounter,
+      required int pagingIndex,
+      required int pagingSize,
+      required this.categoryId})
+      : super(
             products: products,
             filters: filters,
             orders: orders,
@@ -42,10 +45,10 @@ class CategoryProductsInitEvent extends CategoryProductsEvent {
 class CategoryProductsChangeFiltersEvent extends CategoryProductsEvent {
   //+ Constructor
   CategoryProductsChangeFiltersEvent(
-      {required List<Map<String, String>> filters,
-      required List<Map<String, String>> orders,
-      required List<Product> products})
-      : super(products: products, filters: filters, orders: orders);
+      {required String filters,
+      required List<Product> products,
+      required int itemsCounter})
+      : super(products: products, filters: filters, itemsCounter: itemsCounter);
 }
 
 //+ Evento para indicar que se cambio el orden
@@ -60,18 +63,16 @@ class CategoryProductsChangePagingEvent extends CategoryProductsEvent {
 class CategoryProductsChangeOrdersEvent extends CategoryProductsEvent {
   //+ Constructor
   CategoryProductsChangeOrdersEvent(
-      {required List<Map<String, String>> filters,
-      required List<Map<String, String>> orders,
-      required List<Product> products})
-      : super(products: products, filters: filters, orders: orders);
+      {required String orders, required List<Product> products})
+      : super(products: products, orders: orders);
 }
 
-//+ Evento para indicar que los productos se estánc cargando
+//+ Evento para indicar que los productos se están cargando
 class CategoryProductsLoadingEvent extends CategoryProductsEvent {
   //+ Constructor
   CategoryProductsLoadingEvent({
-    required List<Map<String, String>> filters,
-    required List<Map<String, String>> orders,
+    required String filters,
+    required String orders,
     required int itemsCounter,
     required int pagingSize,
   }) : super(
@@ -81,7 +82,7 @@ class CategoryProductsLoadingEvent extends CategoryProductsEvent {
             pagingSize: pagingSize);
 }
 
-//+ Evento para indicar que ocurrio un error
+//+ Evento para indicar que ocurrió un error
 class CategoryProductsErrorEvent extends CategoryProductsEvent {
   //+ Constructor
   CategoryProductsErrorEvent() : super();

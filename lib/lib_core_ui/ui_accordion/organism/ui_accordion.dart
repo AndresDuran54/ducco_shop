@@ -1,4 +1,7 @@
 //+ FLUTTER
+import 'dart:ffi';
+
+import 'package:ducco_shop/lib_core_domain/lib/pipes/pipes.module.dart';
 import 'package:flutter/material.dart';
 
 //+ UTILS
@@ -24,6 +27,35 @@ class UIAccordionFilters extends StatefulWidget {
 
   @override
   State<UIAccordionFilters> createState() => _UIAccordionFiltersState();
+
+  static List<Map<String, String>> buildFilters(
+      List<CategoryFilter> filtersOptions) {
+    final List<Map<String, String>> filters = [];
+    for (var filter in filtersOptions) {
+      switch (filter.type) {
+        case 'input_select':
+          final optionsSelected = filter.options.where((op) => op.selected);
+          if (optionsSelected.isNotEmpty) {
+            filters.add({
+              '"filter"': '"${filter.filter}"',
+              '"val"': '"${optionsSelected.map((op) => op.id).join(',')}"'
+            });
+          }
+          break;
+        case 'input_between':
+          if (filter.options[0].value != '' && filter.options[1].value != '') {
+            filters.add({
+              '"filter"': '"${filter.filter}"',
+              '"val"': '"${filter.options[0].value}"',
+              '"val2"': '"${filter.options[1].value}"'
+            });
+          }
+          break;
+      }
+    }
+
+    return filters;
+  }
 }
 
 class _UIAccordionFiltersState extends State<UIAccordionFilters> {
@@ -111,14 +143,35 @@ class UIAccordionFilterIn extends StatelessWidget {
 
 class UIAccordionFilterBetween extends StatelessWidget {
   final CategoryFilter categoryFilter;
+  final TextEditingController controllerInputGTE =
+      TextEditingController(text: '');
+  final TextEditingController controllerInputLTE =
+      TextEditingController(text: '');
 
-  const UIAccordionFilterBetween({
+  UIAccordionFilterBetween({
     super.key,
     required this.categoryFilter,
   });
 
   @override
   Widget build(BuildContext context) {
+    this.controllerInputGTE.value = TextEditingValue(
+        text: PipesNumber.unitsToDecimal(
+            int.tryParse(categoryFilter.options[0].value) ?? 0, 0));
+    this.controllerInputLTE.value = TextEditingValue(
+        text: PipesNumber.unitsToDecimal(
+            int.tryParse(categoryFilter.options[1].value) ?? 0, 0));
+
+    this.controllerInputGTE.addListener(() {
+      categoryFilter.options[0].value =
+          "${PipesNumber.stringToUnits(this.controllerInputGTE.text)}";
+    });
+
+    this.controllerInputLTE.addListener(() {
+      categoryFilter.options[1].value =
+          "${PipesNumber.stringToUnits(this.controllerInputLTE.text)}";
+    });
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
       child: Column(
@@ -131,6 +184,7 @@ class UIAccordionFilterBetween extends StatelessWidget {
               AppInputTextValidators.checkNumber(
                   errorMsg: 'Verifica que sea un número'),
             ],
+            textEditingController: controllerInputGTE,
           ),
           const SizedBox(height: 12),
           CoreUIInputText(
@@ -141,6 +195,7 @@ class UIAccordionFilterBetween extends StatelessWidget {
               AppInputTextValidators.checkNumber(
                   errorMsg: 'Verifica que sea un número'),
             ],
+            textEditingController: controllerInputLTE,
           )
         ],
       ),

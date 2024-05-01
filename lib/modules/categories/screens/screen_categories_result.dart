@@ -182,9 +182,9 @@ class _ScreenCategoriesResultPaginatorState
   int currentIndex = 1;
   //+ Ancho de cada indice en el paginador
   late double itemWidth;
-  //+ Cantidad de pagidores
-  late int pagingsCount;
-  //+ Subscrición a los estados de Bloc
+  //+ Cantidad de paginadores
+  late int pagingCount;
+  //+ Subscripción a los estados de Bloc
   late StreamSubscription<CategoryProductsState> streamSubscription;
 
   @override
@@ -196,7 +196,7 @@ class _ScreenCategoriesResultPaginatorState
         (widget.itemsCounter > 3 ? 3 : widget.itemsCounter);
 
     //+ Calculamos el número de paginadores
-    this.pagingsCount = (widget.itemsCounter / 10).round();
+    this.pagingCount = (widget.itemsCounter / 10).round();
 
     //+ Nos suscribimos a los cambios de estado del bloc
     this.streamSubscription = widget.categoryProductsBloc.stream
@@ -208,7 +208,7 @@ class _ScreenCategoriesResultPaginatorState
               (state.itemsCounter! > 3 ? 3 : state.itemsCounter!);
 
           //+ Calculamos el número de paginadores
-          this.pagingsCount = (state.itemsCounter! / 10).ceil();
+          this.pagingCount = (state.itemsCounter! / 10).ceil();
         }
       });
     });
@@ -261,7 +261,7 @@ class _ScreenCategoriesResultPaginatorState
             decoration: const BoxDecoration(color: AppColors.gray25Color),
             child: ListView.builder(
                 controller: _controller,
-                itemCount: this.pagingsCount,
+                itemCount: this.pagingCount,
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int i) => GestureDetector(
@@ -294,8 +294,8 @@ class _ScreenCategoriesResultPaginatorState
             onTap: () => {
               this.setState(() {
                 //+ Calculamos el indice actual
-                this.currentIndex = this.currentIndex + 1 > this.pagingsCount
-                    ? this.pagingsCount
+                this.currentIndex = this.currentIndex + 1 > this.pagingCount
+                    ? this.pagingCount
                     : this.currentIndex + 1;
 
                 //+ Hacemos la animación del paginador
@@ -333,6 +333,9 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigationModel = Provider.of<NavigationModel>(context);
+    //+ Bloc de categorías
+    final CategoryProductsBloc categoryProductsBloc =
+        BlocProvider.of<CategoryProductsBloc>(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -375,7 +378,12 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
                               SingleChildScrollView(
                                   child: UIAccordionFilters(
                                 filters: this.category.cardFiltersFo,
-                                onPressedFunc: () => {Navigator.pop(context)},
+                                onPressedFunc: () {
+                                  categoryProductsBloc.changeFilters(
+                                      UIAccordionFilters.buildFilters(
+                                          this.category.cardFiltersFo));
+                                  Navigator.pop(context);
+                                },
                               )))
                     },
                     child: Row(
@@ -397,23 +405,28 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
                           builder: (BuildContext context) =>
                               SingleChildScrollView(
                                   child: CoreUIInputSelectToggle(
-                                optionsList: const [
-                                  InputSelectToggle(
-                                      id: '1', label: 'Precio, mayor a menor'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Precio, menos a mayor'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Relevancia'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Más reciente'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Nombre, creciente'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Nombre, decreciente'),
-                                  InputSelectToggle(
-                                      id: '1', label: 'Descuento'),
-                                ],
-                                onPressedFunc: () => {Navigator.pop(context)},
+                                optionsList: () {
+                                  List<InputSelectToggle> optionsList = [];
+                                  for (int i = 0;
+                                      i < category.cardOrdersFo.length;
+                                      i++) {
+                                    optionsList.add(InputSelectToggle(
+                                        id: i,
+                                        label: category.cardOrdersFo[i].label));
+                                  }
+                                  return optionsList;
+                                }(),
+                                onPressedFunc: (int i) {
+                                  categoryProductsBloc.changeOrders([
+                                    {
+                                      '"order"':
+                                          '"${category.cardOrdersFo[i].order}"',
+                                      '"val"':
+                                          '"${category.cardOrdersFo[i].val}"'
+                                    }
+                                  ]);
+                                  Navigator.pop(context);
+                                },
                               )))
                     },
                     child: Row(

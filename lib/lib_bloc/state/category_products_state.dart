@@ -7,13 +7,15 @@ class CategoryProductsState {
   //+ Cantidad total de los productos por el filtro
   final int? itemsCounter;
   //+ Filtros actuales
-  final List<Map<String, String>>? filters;
+  final String? filters;
   //+ Filtros actuales
-  final List<Map<String, String>>? orders;
-  //+ Indice de páginado actual
+  final String? orders;
+  //+ Indice de paginado actual
   int? pagingIndex;
-  //+ Tamaño de páginado actual
+  //+ Tamaño de paginado actual
   int? pagingSize;
+  //+ Id de la categoría actual
+  int categoryId;
 
   //+ Constructor
   CategoryProductsState(
@@ -22,7 +24,8 @@ class CategoryProductsState {
       this.filters,
       this.orders,
       this.pagingIndex,
-      this.pagingSize});
+      this.pagingSize,
+      required this.categoryId});
 }
 
 //+ Estado que indica los products ya cargaron
@@ -31,17 +34,19 @@ class CategoryProductsPackedState extends CategoryProductsState {
   CategoryProductsPackedState({
     required List<Product> products,
     required int itemsCounter,
-    required List<Map<String, String>> filters,
-    required List<Map<String, String>> orders,
+    required String filters,
+    required String orders,
     required int pagingIndex,
     required int pagingSize,
+    required int categoryId,
   }) : super(
             products: products,
             itemsCounter: itemsCounter,
             filters: filters,
             orders: orders,
             pagingIndex: pagingIndex,
-            pagingSize: pagingSize);
+            pagingSize: pagingSize,
+            categoryId: categoryId);
 }
 
 //+ Estado que indica los products se están cargaron
@@ -49,13 +54,15 @@ class CategoryProductsLoadingState extends CategoryProductsState {
   //+ Constructor
   //+ Constructor
   CategoryProductsLoadingState({
-    required List<Map<String, String>> filters,
-    required List<Map<String, String>> orders,
+    required String filters,
+    required String orders,
     required int itemsCounter,
     required int pagingSize,
+    required int categoryId,
   }) : super(
             itemsCounter: itemsCounter,
             filters: filters,
             orders: orders,
-            pagingSize: pagingSize);
+            pagingSize: pagingSize,
+            categoryId: categoryId);
 }

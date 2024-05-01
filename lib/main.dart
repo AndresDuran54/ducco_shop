@@ -12,6 +12,8 @@ void main() {
         create: (BuildContext context) => new ShoppingCartBloc()),
     BlocProvider<CategoryProductsBloc>(
         create: (BuildContext context) => new CategoryProductsBloc()),
+    BlocProvider<CustomerBloc>(
+        create: (BuildContext context) => new CustomerBloc()),
   ], child: const MyApp()));
 }
 

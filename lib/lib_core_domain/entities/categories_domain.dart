@@ -32,13 +32,28 @@ class CategoryFilter {
       );
 }
 
+class CategoryOrder {
+  String val;
+  String label;
+  String order;
+
+  CategoryOrder({required this.val, required this.label, required this.order});
+
+  factory CategoryOrder.fromJson(Map<String, dynamic> json) => CategoryOrder(
+      val: json["val"], label: json["label"], order: json["order"]);
+}
+
 class CategoryFilterOption {
   String id;
   String label;
+  String value;
   bool selected;
 
   CategoryFilterOption(
-      {required this.id, required this.label, this.selected = false});
+      {required this.id,
+      required this.label,
+      this.selected = false,
+      this.value = ''});
 
   factory CategoryFilterOption.fromJson(Map<String, dynamic> json) =>
       CategoryFilterOption(
@@ -56,6 +71,7 @@ class Category {
   int cardShowFo;
   int cardOrderFo;
   List<CategoryFilter> cardFiltersFo;
+  List<CategoryOrder> cardOrdersFo;
   int insTimestamp;
 
   Category({
@@ -67,6 +83,7 @@ class Category {
     required this.cardShowFo,
     required this.cardOrderFo,
     required this.cardFiltersFo,
+    required this.cardOrdersFo,
     required this.insTimestamp,
   });
 
@@ -80,6 +97,8 @@ class Category {
         cardOrderFo: json["cardOrderFO"],
         cardFiltersFo: List<CategoryFilter>.from(json["cardFiltersFO"]
             .map((filter) => CategoryFilter.fromJson(filter))),
+        cardOrdersFo: List<CategoryOrder>.from(json["cardOrdersFO"]
+            .map((filter) => CategoryOrder.fromJson(filter))),
         insTimestamp: json["insTimestamp"],
       );
 }

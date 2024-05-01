@@ -269,12 +269,12 @@ class ScreenFormState extends State<ScreenForm> {
             ]),
             const SizedBox(height: 14),
             //+ Nombres
-            const CoreUIInputText(
+            CoreUIInputText(
               labelText: 'Piso o departamento (Opcional)',
             ),
             const SizedBox(height: 14),
             //+ Nombres
-            const CoreUIInputText(
+            CoreUIInputText(
               labelText: 'Referencia (Opcional)',
             ),
             const SizedBox(height: 16),

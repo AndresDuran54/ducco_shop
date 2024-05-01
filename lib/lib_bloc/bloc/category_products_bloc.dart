@@ -17,11 +17,11 @@ class CategoryProductsBloc
 
   CategoryProductsBloc()
       : super(CategoryProductsLoadingState(
-          filters: [],
-          orders: [],
-          itemsCounter: 0,
-          pagingSize: 10,
-        )) {
+            filters: '',
+            orders: '',
+            itemsCounter: 0,
+            pagingSize: 10,
+            categoryId: 0)) {
     //+ CategoryProductsInitEvent
     on<CategoryProductsInitEvent>(
         (CategoryProductsInitEvent event, Emitter<CategoryProductsState> emit) {
@@ -32,7 +32,8 @@ class CategoryProductsBloc
           orders: event.orders!,
           pagingIndex: event.pagingIndex!,
           pagingSize: event.pagingSize!,
-          products: event.products!));
+          products: event.products!,
+          categoryId: event.categoryId));
     });
 
     //+ CategoryProductsChangePagingEvent
@@ -46,7 +47,38 @@ class CategoryProductsBloc
           itemsCounter: state.itemsCounter!,
           pagingIndex: event.pagingIndex!,
           pagingSize: state.pagingSize!,
-          products: event.products!));
+          products: event.products!,
+          categoryId: state.categoryId));
+    });
+
+    //+ CategoryProductsChangeFiltersEvent
+    on<CategoryProductsChangeFiltersEvent>(
+        (CategoryProductsChangeFiltersEvent event,
+            Emitter<CategoryProductsState> emit) {
+      //+ Emitimos el nuevo evento
+      emit(CategoryProductsPackedState(
+          filters: event.filters!,
+          orders: state.orders!,
+          itemsCounter: event.itemsCounter!,
+          pagingIndex: 1,
+          pagingSize: state.pagingSize!,
+          products: event.products!,
+          categoryId: state.categoryId));
+    });
+
+    //+ CategoryProductsChangeFiltersEvent
+    on<CategoryProductsChangeOrdersEvent>(
+        (CategoryProductsChangeOrdersEvent event,
+            Emitter<CategoryProductsState> emit) {
+      //+ Emitimos el nuevo evento
+      emit(CategoryProductsPackedState(
+          filters: state.filters!,
+          orders: event.orders!,
+          itemsCounter: state.itemsCounter!,
+          pagingIndex: 1,
+          pagingSize: state.pagingSize!,
+          products: event.products!,
+          categoryId: state.categoryId));
     });
 
     //+ CategoryProductsLoadingEvent
@@ -54,11 +86,11 @@ class CategoryProductsBloc
         Emitter<CategoryProductsState> emit) {
       //+ Emitimos el nuevo evento
       emit(CategoryProductsLoadingState(
-        filters: event.filters!,
-        orders: event.orders!,
-        itemsCounter: event.itemsCounter!,
-        pagingSize: event.pagingSize!,
-      ));
+          filters: event.filters!,
+          orders: event.orders!,
+          itemsCounter: event.itemsCounter!,
+          pagingSize: event.pagingSize!,
+          categoryId: state.categoryId));
     });
   }
 
@@ -67,7 +99,7 @@ class CategoryProductsBloc
     try {
       //+ Mandamos el evento para inicializar la vista
       add(CategoryProductsLoadingEvent(
-          filters: [], orders: [], itemsCounter: 0, pagingSize: 10));
+          filters: '', orders: '', itemsCounter: 0, pagingSize: 10));
 
       //+ Construimos el filtro inicial
       final List<Map<String, String>> filters = [
@@ -88,13 +120,13 @@ class CategoryProductsBloc
 
       //+ Mandamos el evento para inicializar la vista
       add(CategoryProductsInitEvent(
-        filters: filters,
-        orders: orders,
-        products: productsItems.items,
-        itemsCounter: productsItems.itemsCounterTotal,
-        pagingIndex: 1,
-        pagingSize: 10,
-      ));
+          filters: filters.toString(),
+          orders: orders.toString(),
+          products: productsItems.items,
+          itemsCounter: productsItems.itemsCounterTotal,
+          pagingIndex: 1,
+          pagingSize: 10,
+          categoryId: categoryId));
     } catch (err) {
       //+ Mandamos el evento de error
       add(CategoryProductsErrorEvent());
@@ -124,6 +156,70 @@ class CategoryProductsBloc
       //+ Mandamos el evento para inicializar la vista
       add(CategoryProductsChangePagingEvent(
           pagingIndex: pagingIndex, products: productsItems.items));
+    } catch (err) {
+      //+ Mandamos el evento de error
+      add(CategoryProductsErrorEvent());
+    }
+  }
+
+  //+ Método para cambiar la paginación
+  void changeFilters(List<Map<String, String>> filters) async {
+    try {
+      //+ Agregamos el categoryId
+      filters
+          .add({'"filter"': '"categoryId"', '"val"': '"${state.categoryId}"'});
+
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsLoadingEvent(
+        filters: state.filters!,
+        orders: state.orders!,
+        itemsCounter: state.itemsCounter!,
+        pagingSize: state.pagingSize!,
+      ));
+
+      //+ Obtenemos los registros de productos
+      ProductsGetItems productsItems =
+          await this.productService.productsGetItems(headers: {
+        'filters': filters.toString(),
+        'orders': state.orders.toString(),
+        'paging_index': state.pagingIndex.toString(),
+        'paging_size': state.pagingSize.toString(),
+      });
+
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsChangeFiltersEvent(
+          filters: filters.toString(),
+          products: productsItems.items,
+          itemsCounter: productsItems.itemsCounterTotal));
+    } catch (err) {
+      //+ Mandamos el evento de error
+      add(CategoryProductsErrorEvent());
+    }
+  }
+
+  //+ Método para cambiar el orden
+  void changeOrders(List<Map<String, String>> orders) async {
+    try {
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsLoadingEvent(
+        filters: state.filters!,
+        orders: state.orders!,
+        itemsCounter: state.itemsCounter!,
+        pagingSize: state.pagingSize!,
+      ));
+
+      //+ Obtenemos los registros de productos
+      ProductsGetItems productsItems =
+          await this.productService.productsGetItems(headers: {
+        'filters': state.filters.toString(),
+        'orders': orders.toString(),
+        'paging_index': state.pagingIndex.toString(),
+        'paging_size': state.pagingSize.toString(),
+      });
+
+      //+ Mandamos el evento para inicializar la vista
+      add(CategoryProductsChangeOrdersEvent(
+          orders: orders.toString(), products: productsItems.items));
     } catch (err) {
       //+ Mandamos el evento de error
       add(CategoryProductsErrorEvent());

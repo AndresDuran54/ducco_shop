@@ -85,7 +85,7 @@ class ProductDetailScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                              '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesDecimal.unitsToDecimal(shoppingCardProducts.product.inventoryPrice, 2)}',
+                              '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(shoppingCardProducts.product.inventoryPrice, 2)}',
                               style: AppFonts.titleHeavy(
                                   color: AppColors.secondary50Color,
                                   fontFamily: 'Ubuntu')),

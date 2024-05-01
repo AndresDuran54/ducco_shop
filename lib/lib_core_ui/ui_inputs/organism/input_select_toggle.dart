@@ -7,7 +7,7 @@ import 'package:ducco_shop/utils/fonts/fonts.dart';
 
 class CoreUIInputSelectToggle extends StatelessWidget {
   final List<InputSelectToggle> optionsList;
-  final void Function()? onPressedFunc;
+  final void Function(int index)? onPressedFunc;
 
   const CoreUIInputSelectToggle({
     super.key,
@@ -23,12 +23,14 @@ class CoreUIInputSelectToggle extends StatelessWidget {
       height: size.height,
       child: Center(
         child: Container(
-          height: optionsList.length * 55,
+          height: optionsList.length * 70,
           padding: const EdgeInsets.all(16),
           child: ListView.builder(
               itemCount: optionsList.length,
               itemBuilder: (BuildContext context, int i) => GestureDetector(
-                    onTap: onPressedFunc,
+                    onTap: () {
+                      onPressedFunc?.call(optionsList[i].id);
+                    },
                     child: Container(
                       height: 50,
                       decoration: const BoxDecoration(
@@ -53,7 +55,7 @@ class CoreUIInputSelectToggle extends StatelessWidget {
 }
 
 class InputSelectToggle {
-  final String id;
+  final int id;
   final String label;
 
   const InputSelectToggle({
