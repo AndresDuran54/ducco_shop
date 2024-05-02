@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 class CoreUIInputText extends StatefulWidget {
   final String labelText;
+  final bool obscureText;
   final List<String? Function({required String value})> validators;
   final TextInputType textInputType;
   final TextEditingController textEditingController;
@@ -15,6 +16,7 @@ class CoreUIInputText extends StatefulWidget {
 
   CoreUIInputText(
       {super.key,
+      this.obscureText = false,
       required this.labelText,
       TextEditingController? textEditingController,
       this.validators = const [],
@@ -73,6 +75,7 @@ class _CoreUIInputTextState extends State<CoreUIInputText> {
       key: formKey,
       controller: this.widget.textEditingController,
       keyboardType: this.widget.textInputType,
+      obscureText: this.widget.obscureText,
       inputFormatters: [
         if (this.widget.textInputType == TextInputType.number)
           FilteringTextInputFormatter.digitsOnly

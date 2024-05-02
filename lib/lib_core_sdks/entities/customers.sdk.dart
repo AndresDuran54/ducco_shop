@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_initializing_formals
 
 class SDKCustomersNewItem {
   late dynamic item;
@@ -12,6 +12,6 @@ class SDKCustomersNewItemError {
   late String messageId;
 
   SDKCustomersNewItemError(String messageId) {
-    messageId = messageId;
+    this.messageId = messageId;
   }
 }

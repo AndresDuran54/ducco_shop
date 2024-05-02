@@ -83,6 +83,18 @@ class NavigationBarOverview extends StatelessWidget {
     //+ Inyectamos el navigationModel
     final navigationModel = Provider.of<NavigationModel>(context);
 
+    if (ModalRoute.of(context)?.settings != null &&
+        ModalRoute.of(context)?.settings.arguments != null) {
+      final Map<String, dynamic> arguments =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      if (arguments['pageIndex'] != -1) {
+        Future.delayed(const Duration(microseconds: 250), () {
+          navigationModel.actualPage = arguments['pageIndex'];
+          arguments['pageIndex'] = -1;
+        });
+      }
+    }
+
     return BottomNavigationBar(
         currentIndex: navigationModel.actualPage,
         onTap: (int index) => navigationModel.actualPage = index,

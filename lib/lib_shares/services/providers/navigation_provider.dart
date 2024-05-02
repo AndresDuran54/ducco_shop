@@ -33,7 +33,7 @@ class NavigationModel with ChangeNotifier {
     this._actualPage = actualPage;
     //+ Cambiamos de página
     this._pageController.animateToPage(this._actualPage,
-        duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+        duration: const Duration(milliseconds: 250), curve: Curves.linear);
     //+ Notificamos a los oyentes
     this.notifyListeners();
   }

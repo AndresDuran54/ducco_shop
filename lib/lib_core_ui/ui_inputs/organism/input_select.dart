@@ -6,12 +6,20 @@ class CoreUIInputSelect extends StatelessWidget {
   final List<DropdownMenuItem<String>> optionsList;
   final String value;
   final String labelText;
+  final TextEditingController textEditingController;
+  static final TextEditingController defaultTextEditingController =
+      TextEditingController();
 
-  const CoreUIInputSelect(
+  CoreUIInputSelect(
       {super.key,
+      TextEditingController? textEditingController,
       required this.optionsList,
       required this.value,
-      this.labelText = ''});
+      this.labelText = ''})
+      : textEditingController =
+            textEditingController ?? defaultTextEditingController {
+    this.textEditingController.text = this.value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,11 @@ class CoreUIInputSelect extends StatelessWidget {
         ),
       ),
       isExpanded: true,
-      onChanged: (String? value) => {},
+      onChanged: (String? value) {
+        if (value != null) {
+          textEditingController.text = value;
+        }
+      },
       items: this.optionsList,
       style: AppFonts.labelTextLight(
           color: AppColors.gray40Color, fontFamily: 'Roboto'),

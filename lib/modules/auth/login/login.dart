@@ -11,7 +11,7 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        color: AppColors.primary10Color,
+        color: AppColors.gray50Color,
         child: _FormLogin(size: size),
       ),
     );
@@ -79,14 +79,17 @@ class _FormLoginState extends State<_FormLogin> {
               style: TextStyle(color: AppColors.gray80Color),
             ),
             TextButton(
-                onPressed: () => {print('a')},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/home/overview',
+                      arguments: {'pageIndex': 3});
+                },
                 style: ButtonStyle(
                   overlayColor: MaterialStateProperty.all<Color>(AppColors
                       .gray30Color), // Cambia el color de superposición a amarillo
                 ),
                 child: const Text(
-                  'Registrate',
-                  style: TextStyle(color: AppColors.secondary70Color),
+                  'Regístrate',
+                  style: TextStyle(color: AppColors.secondary100Color),
                 ))
           ],
         )

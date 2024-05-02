@@ -27,6 +27,34 @@ class AppInputTextValidators {
     };
   }
 
+  /// Esta función comprueba si un string tiene una longitud máxima
+  ///
+  /// [value] Valor a verificar.
+  /// [maxLength] Longitud máxima.
+  /// [errorMsg] Mensaje de error en caso no sea un email.
+  ///
+  /// Devuelve null si value no está vació y errorMsg si lo está.
+  static String? Function({required String value}) maxLength(
+      {required String errorMsg, required int maxLength}) {
+    return ({required String value}) {
+      return value.length <= maxLength ? null : errorMsg;
+    };
+  }
+
+  /// Esta función comprueba si un string tiene una longitud mínima
+  ///
+  /// [value] Valor a verificar.
+  /// [maxLength] Longitud mínima.
+  /// [errorMsg] Mensaje de error en caso no sea un email.
+  ///
+  /// Devuelve null si value no está vació y errorMsg si lo está.
+  static String? Function({required String value}) minLength(
+      {required String errorMsg, required int minLength}) {
+    return ({required String value}) {
+      return value.length >= minLength ? null : errorMsg;
+    };
+  }
+
   /// Esta función comprueba si un string es un número o no
   ///
   /// [value] Valor a verificar.

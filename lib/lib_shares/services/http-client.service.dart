@@ -76,11 +76,15 @@ class HttpClientService {
   Future<PostResponse> post(String url,
       {Map<String, String>? queryParameters,
       Map<String, String>? headers,
-      Map<String, String>? body}) async {
+      Map<String, dynamic>? body}) async {
     try {
       //+ Ejecutamos la request
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: json.encode(body));
+
+      if (response.statusCode != 200) {
+        throw Exception(response.body);
+      }
 
       //+ Parseamos la request
       return PostResponse(body: json.decode(response.body));

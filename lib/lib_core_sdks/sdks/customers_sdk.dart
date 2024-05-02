@@ -27,7 +27,7 @@ class CustomersSDKService {
 
   //+ Crear un nuevo cliente
   Future<dynamic> customersNewItem(
-      {Map<String, String>? headers, Map<String, String>? body}) async {
+      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
     try {
       //+ Obtenemos los registro de los productos
       final response = await _httpClientService.post(
@@ -40,7 +40,7 @@ class CustomersSDKService {
         item: response.body['data']['item'],
       );
     } catch (error) {
-      return SDKCustomersNewItemError(error.toString());
+      throw new SDKCustomersNewItemError(error.toString());
     }
   }
 }
