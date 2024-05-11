@@ -77,20 +77,16 @@ class HttpClientService {
       {Map<String, String>? queryParameters,
       Map<String, String>? headers,
       Map<String, dynamic>? body}) async {
-    try {
-      //+ Ejecutamos la request
-      final response = await http.post(Uri.parse(url),
-          headers: headers, body: json.encode(body));
+    //+ Ejecutamos la request
+    final response = await http.post(Uri.parse(url),
+        headers: headers, body: json.encode(body));
 
-      if (response.statusCode != 200) {
-        throw Exception(response.body);
-      }
-
-      //+ Parseamos la request
-      return PostResponse(body: json.decode(response.body));
-    } catch (e) {
-      throw Exception(e);
+    if (response.statusCode != 200) {
+      throw new HttpError(response.body);
     }
+
+    //+ Parseamos la request
+    return PostResponse(body: json.decode(response.body));
   }
 
   // /// Realiza una solicitud PATCH a la URL especificada con los datos proporcionados.
@@ -107,4 +103,15 @@ class HttpClientService {
   //     throw Exception(e);
   //   }
   // }
+}
+
+class HttpError extends Error {
+  final String data;
+
+  HttpError(this.data);
+
+  @override
+  String toString() {
+    return 'MiError: $data';
+  }
 }

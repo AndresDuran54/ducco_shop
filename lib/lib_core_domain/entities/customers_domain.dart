@@ -50,22 +50,49 @@ class Customer {
 
 class CustomersNewItem {
   late Customer item;
+  late Session session;
 
   CustomersNewItem({
     required this.item,
+    required this.session,
   });
 }
 
-class CustomersNewItemError {
-  late bool INTERNAL_SERVER_ERROR;
+//+ SESSIONS
+class Session {
+  int customerId;
+  String token;
+  int expTimestamp;
+  int insTimestamp;
 
-  CustomersNewItemError(String messageId) {
-    switch (messageId) {
-      case "INTERNAL_SERVER_ERROR":
-        INTERNAL_SERVER_ERROR = true;
-        break;
-      default:
-        INTERNAL_SERVER_ERROR = true;
-    }
-  }
+  Session({
+    required this.customerId,
+    required this.token,
+    required this.expTimestamp,
+    required this.insTimestamp,
+  });
+
+  factory Session.fromJson(Map<String, dynamic> json) => Session(
+        customerId: json["customerId"],
+        token: json["token"],
+        expTimestamp: json["expTimestamp"],
+        insTimestamp: json["insTimestamp"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "customerId": customerId,
+        "token": token,
+        "expTimestamp": expTimestamp,
+        "insTimestamp": insTimestamp,
+      };
+}
+
+class SessionLogin {
+  late Session item;
+  late Customer customer;
+
+  SessionLogin({
+    required this.item,
+    required this.customer,
+  });
 }

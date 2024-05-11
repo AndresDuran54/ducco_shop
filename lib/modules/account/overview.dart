@@ -3,6 +3,9 @@ import 'package:ducco_shop/lib_bloc/state/customer_state.dart';
 import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_toast/module.dart';
+import 'package:ducco_shop/lib_core_ui/ui_toast/organism/toast_confirm.dart';
+import 'package:ducco_shop/lib_shares/services/toast.service.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';
 import 'package:flutter/material.dart';
@@ -47,17 +50,24 @@ class AccountOverview extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              NewProfileInformationDataForm(documentOptions: documentOptions),
+              NewProfileInformationDataForm(
+                documentOptions: documentOptions,
+              ),
             ],
           );
         }
         return ListView(
           children: <Widget>[
-            const MyProfileInformationCard(),
+            MyProfileInformationCard(
+              customer: state.customer!,
+            ),
             const SizedBox(
               height: 20,
             ),
-            MyProfileInformationDataForm(documentOptions: documentOptions),
+            MyProfileInformationDataForm(
+              documentOptions: documentOptions,
+              customer: state.customer!,
+            ),
             const SizedBox(
               height: 20,
             ),
@@ -92,8 +102,21 @@ class NewProfileInformationDataForm extends StatelessWidget {
   final CustomersDomainService customersService =
       CustomersDomainService.customersDomainService;
 
+  //+ Servicio para los toast
+  static final ToastService _toastService = ToastService.toastService;
+
+  //+ Indica si al finalizar el registro se debe de redirigir al carrito de compras
+  bool shoppingCard = false;
+
   @override
   Widget build(BuildContext context) {
+    if (ModalRoute.of(context)?.settings != null &&
+        ModalRoute.of(context)?.settings.arguments != null) {
+      final Map<String, dynamic> arguments =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      shoppingCard = arguments['shoppingCart'] != null;
+    }
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
@@ -174,7 +197,11 @@ class NewProfileInformationDataForm extends StatelessWidget {
               textInputType: TextInputType.number,
               validators: [
                 AppInputTextValidators.checkRequired(
-                    errorMsg: 'El número celular es requerido')
+                    errorMsg: 'El número celular es requerido'),
+                AppInputTextValidators.maxLength(
+                    errorMsg:
+                        'La contraseña debe de tener 9 caracteres como máximo',
+                    maxLength: 9),
               ],
               textEditingController: phoneCtrl,
             ),
@@ -230,17 +257,31 @@ class NewProfileInformationDataForm extends StatelessWidget {
               onPressedFunc: () {
                 if (keyForm.currentState != null &&
                     keyForm.currentState!.validate()) {
-                  customersService.customersNewItem(body: {
-                    "ident": identCtrl.text,
-                    "identification": identificationCtrl.text,
-                    "email": emailCtrl.text,
-                    "firstName": firstNameCtrl.text,
-                    "lastName": lastNameCtrl.text,
-                    "phone": phoneCtrl.text,
-                    "password": passwordCtrl.text,
-                    "birthdayTimestamp": birthdayCtrl.text,
-                  });
-                } else {}
+                  customersService.customersNewItem(
+                      body: {
+                        "identId": identCtrl.text,
+                        "identification": identificationCtrl.text,
+                        "email": emailCtrl.text,
+                        "firstName": firstNameCtrl.text,
+                        "lastName": lastNameCtrl.text,
+                        "phoneNumber": phoneCtrl.text,
+                        "password": passwordCtrl.text,
+                        "birthdayTimestamp": int.parse(birthdayCtrl.text),
+                      },
+                      context: context,
+                      onFinalizeFunc: shoppingCard
+                          ? () {
+                              Navigator.pushNamed(context, '/home/overview',
+                                  arguments: {'pageIndex': 2});
+
+                              _toastService.showToast(
+                                  context,
+                                  '¡Bienvenido ${firstNameCtrl.text}!',
+                                  '¡Listo! Ya puedes continuar con tu compra.',
+                                  ToastServiceType.SUCCESS);
+                            }
+                          : null);
+                }
               },
               enabledColor: AppColors.secondary80Color,
               disabledColor: AppColors.secondary20Color,
@@ -301,7 +342,7 @@ class NewProfileInformationCard extends StatelessWidget {
               height: 8,
             ),
             Text(
-              'Si ya tienes una, inicia sesión',
+              'Si ya tienes una, inicia sesión.',
               textAlign: TextAlign.start,
               style: AppFonts.labelTextLight(
                   color: AppColors.black20Color, fontFamily: 'Ubuntu'),
@@ -314,12 +355,33 @@ class NewProfileInformationCard extends StatelessWidget {
 }
 
 class MyProfileInformationDataForm extends StatelessWidget {
-  const MyProfileInformationDataForm({
+  MyProfileInformationDataForm({
     super.key,
     required this.documentOptions,
-  });
+    required this.customer,
+  }) {
+    identCtrl = new TextEditingController(text: customer.identId);
+    identificationCtrl =
+        new TextEditingController(text: customer.identification);
+    emailCtrl = new TextEditingController(text: customer.email);
+    firstNameCtrl = new TextEditingController(text: customer.firstName);
+    lastNameCtrl = new TextEditingController(text: customer.lastName);
+    phoneCtrl = new TextEditingController(text: customer.phoneNumber);
+    birthdayCtrl =
+        new TextEditingController(text: '${customer.birthdayTimestamp}');
+  }
 
   final List<DropdownMenuItem<String>> documentOptions;
+  final Customer customer;
+
+  final GlobalKey<FormState> keyForm = new GlobalKey();
+  late TextEditingController identCtrl;
+  late TextEditingController identificationCtrl;
+  late TextEditingController emailCtrl;
+  late TextEditingController firstNameCtrl;
+  late TextEditingController lastNameCtrl;
+  late TextEditingController phoneCtrl;
+  late TextEditingController birthdayCtrl;
 
   @override
   Widget build(BuildContext context) {
@@ -328,87 +390,111 @@ class MyProfileInformationDataForm extends StatelessWidget {
       decoration: const BoxDecoration(
           color: AppColors.gray100Color,
           borderRadius: BorderRadius.all(Radius.circular(8))),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Completa tu perfil',
-            textAlign: TextAlign.start,
-            style: AppFonts.subTitle2Heavy(
-                color: AppColors.black20Color, fontFamily: 'Ubuntu'),
-          ),
-          const SizedBox(height: 8),
-          //+ Tipo de identificación
-          SizedBox(
-              height: 60,
-              child: CoreUIInputSelect(
-                optionsList: this.documentOptions,
-                value: "DNI",
-                labelText: 'Tipo de documento',
-              )),
-          const SizedBox(height: 14),
-          //+ Identificación
-          CoreUIInputText(
-            labelText: 'Identificación',
-            textInputType: TextInputType.number,
-            validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'La identificación es requerida')
-            ],
-          ),
-          const SizedBox(height: 14),
-          //+ Correo electrónico
-          CoreUIInputText(labelText: 'Correo electrónico', validators: [
-            AppInputTextValidators.checkRequired(
-                errorMsg: 'El correo electrónico es requerido'),
-            AppInputTextValidators.checkEmail(
-                errorMsg: 'Ingrese un formato de correo correcto'),
-          ]),
-          const SizedBox(height: 14),
-          //+ Nombres
-          CoreUIInputText(
-            labelText: 'Nombres',
-            validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'Los nombres son requeridos'),
-              AppInputTextValidators.checkText(
-                  errorMsg: 'Los nombres solo deben contener letras')
-            ],
-          ),
-          const SizedBox(height: 14),
-          //+ Apellidos
-          CoreUIInputText(
-            labelText: 'Apellidos',
-            validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'Los apellidos son requeridos'),
-              AppInputTextValidators.checkText(
-                  errorMsg: 'Los apellidos solo deben contener letras')
-            ],
-          ),
-          const SizedBox(height: 14),
-          //+ Número celular
-          CoreUIInputText(
-            labelText: 'Número celular',
-            textInputType: TextInputType.number,
-            validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'El número celular es requerido')
-            ],
-          ),
-          const SizedBox(height: 16),
-          UIButton(
-            onPressedFunc: () {},
-            enabledColor: AppColors.secondary80Color,
-            disabledColor: AppColors.secondary20Color,
-            splashColor: AppColors.gray70Color,
-            width: double.infinity,
-            text: 'Editar',
-            textStyle: AppFonts.subTitle2Heavy(
-                color: AppColors.gray100Color, fontFamily: 'Ubuntu'),
-          )
-        ],
+      child: Form(
+        key: keyForm,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Completa tu perfil',
+              textAlign: TextAlign.start,
+              style: AppFonts.subTitle2Heavy(
+                  color: AppColors.black20Color, fontFamily: 'Ubuntu'),
+            ),
+            const SizedBox(height: 8),
+            //+ Tipo de identificación
+            SizedBox(
+                height: 60,
+                child: CoreUIInputSelect(
+                  optionsList: this.documentOptions,
+                  value: "DNI",
+                  labelText: 'Tipo de documento',
+                  textEditingController: identCtrl,
+                )),
+            const SizedBox(height: 14),
+            //+ Identificación
+            CoreUIInputText(
+              labelText: 'Identificación',
+              textInputType: TextInputType.number,
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'La identificación es requerida')
+              ],
+              textEditingController: identificationCtrl,
+            ),
+            const SizedBox(height: 14),
+            //+ Correo electrónico
+            CoreUIInputText(
+                labelText: 'Correo electrónico',
+                validators: [
+                  AppInputTextValidators.checkRequired(
+                      errorMsg: 'El correo electrónico es requerido'),
+                  AppInputTextValidators.checkEmail(
+                      errorMsg: 'Ingrese un formato de correo correcto'),
+                ],
+                textEditingController: emailCtrl),
+            const SizedBox(height: 14),
+            //+ Nombres
+            CoreUIInputText(
+              labelText: 'Nombres',
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'Los nombres son requeridos'),
+                AppInputTextValidators.checkText(
+                    errorMsg: 'Los nombres solo deben contener letras')
+              ],
+              textEditingController: firstNameCtrl,
+            ),
+            const SizedBox(height: 14),
+            //+ Apellidos
+            CoreUIInputText(
+              labelText: 'Apellidos',
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'Los apellidos son requeridos'),
+                AppInputTextValidators.checkText(
+                    errorMsg: 'Los apellidos solo deben contener letras')
+              ],
+              textEditingController: lastNameCtrl,
+            ),
+            const SizedBox(height: 14),
+            //+ Número celular
+            CoreUIInputText(
+              labelText: 'Número celular',
+              textInputType: TextInputType.number,
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'El número celular es requerido'),
+                AppInputTextValidators.maxLength(
+                    errorMsg:
+                        'La contraseña debe de tener 9 caracteres como máximo',
+                    maxLength: 9),
+              ],
+              textEditingController: phoneCtrl,
+            ),
+            const SizedBox(height: 16),
+            CoreUIInputCalendar(
+              labelText: 'Fecha de cumpleaños',
+              textEditingController: birthdayCtrl,
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'La fecha de cumpleaños es requerida'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            UIButton(
+              onPressedFunc: () {},
+              enabledColor: AppColors.secondary80Color,
+              disabledColor: AppColors.secondary20Color,
+              splashColor: AppColors.gray70Color,
+              width: double.infinity,
+              text: 'Editar',
+              textStyle: AppFonts.subTitle2Heavy(
+                  color: AppColors.gray100Color, fontFamily: 'Ubuntu'),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -475,9 +561,9 @@ class MyProfileInformationPasswordForm extends StatelessWidget {
 }
 
 class MyProfileInformationCard extends StatelessWidget {
-  const MyProfileInformationCard({
-    super.key,
-  });
+  const MyProfileInformationCard({super.key, required this.customer});
+
+  final Customer customer;
 
   @override
   Widget build(BuildContext context) {
@@ -496,7 +582,7 @@ class MyProfileInformationCard extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(100))),
           child: Center(
             child: Text(
-              'AD',
+              '${customer.firstName[0].toUpperCase()}${customer.lastName[0].toUpperCase()}',
               textAlign: TextAlign.start,
               style: AppFonts.bigTitleHeavy(
                   color: AppColors.gray100Color, fontFamily: 'Roboto'),
@@ -511,13 +597,13 @@ class MyProfileInformationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Andrés Ángel Duran Ccota',
+              '${customer.firstName} ${customer.lastName}',
               textAlign: TextAlign.start,
               style: AppFonts.subTitle2Heavy(
                   color: AppColors.black20Color, fontFamily: 'Ubuntu'),
             ),
             Text(
-              'andres_angeles@hotmail.es',
+              customer.email,
               textAlign: TextAlign.start,
               style: AppFonts.labelTextLight(
                   color: AppColors.black20Color, fontFamily: 'Ubuntu'),

@@ -1,3 +1,4 @@
+import 'package:ducco_shop/lib_core_domain/domain/customers_domain.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/colors/colors.dart';
@@ -31,9 +32,13 @@ class _FormLogin extends StatefulWidget {
 }
 
 class _FormLoginState extends State<_FormLogin> {
-  //Controladores de inputs
+  //+ Controladores de inputs
   final usernameCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+
+  //+ Controlador de usuarios
+  final CustomersDomainService customersDomainService =
+      CustomersDomainService.customersDomainService;
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +68,12 @@ class _FormLoginState extends State<_FormLogin> {
                     usernameCtrl: usernameCtrl,
                     passwordCtrl: passwordCtrl,
                     onPressed: () => {
-                          if (usernameCtrl.text == 'root' &&
-                              passwordCtrl.text == 'root')
-                            {Navigator.pushNamed(context, '/home/overview')}
+                          customersDomainService.sessionsLogin(
+                              context: context,
+                              body: {
+                                "email": usernameCtrl.text,
+                                "password": passwordCtrl.text
+                              })
                         }),
               ],
             ),
@@ -158,7 +166,7 @@ class _InputUsernameLogin extends StatelessWidget {
             ),
             filled: true,
             fillColor: AppColors.gray80Color,
-            hintText: 'Usuarios',
+            hintText: 'Email',
             hintStyle: TextStyle(color: AppColors.gray50Color),
             border: OutlineInputBorder(
                 borderSide: BorderSide.none,

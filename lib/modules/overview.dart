@@ -88,7 +88,7 @@ class NavigationBarOverview extends StatelessWidget {
       final Map<String, dynamic> arguments =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
       if (arguments['pageIndex'] != -1) {
-        Future.delayed(const Duration(microseconds: 250), () {
+        Future.delayed(const Duration(microseconds: 1), () {
           navigationModel.actualPage = arguments['pageIndex'];
           arguments['pageIndex'] = -1;
         });

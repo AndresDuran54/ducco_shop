@@ -6,7 +6,7 @@ import 'package:ducco_shop/lib_core_sdks/entities/categories.sdk.dart';
 import 'package:ducco_shop/lib_shares/services/http-client.service.dart';
 
 class CategoriesSDKService {
-  //+ Instacia de dio
+  //+ Instancia de dio
   static final HttpClientService _httpClientService =
       HttpClientService.httpClientService;
 
@@ -25,7 +25,7 @@ class CategoriesSDKService {
     'categories': {'getItems': '${env.MICROS.CATEGORIES.HOST}/v1/categories'}
   };
 
-  //+ Obtenemos las categorias
+  //+ Obtenemos las categorías
   Future<dynamic> categoriesGetItems({Map<String, String>? headers}) async {
     try {
       //+ Obtenemos los registro de los productos

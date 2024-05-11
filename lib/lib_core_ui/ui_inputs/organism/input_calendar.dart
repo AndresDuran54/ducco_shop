@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class CoreUIInputCalendar extends StatefulWidget {
   final String labelText;
+  final bool obscureText;
   final List<String? Function({required String value})> validators;
   final TextEditingController textEditingController;
   static final TextEditingController defaultTextEditingController =
@@ -15,6 +16,7 @@ class CoreUIInputCalendar extends StatefulWidget {
   CoreUIInputCalendar(
       {super.key,
       required this.labelText,
+      this.obscureText = false,
       TextEditingController? textEditingController,
       this.validators = const []})
       : textEditingController =
@@ -28,6 +30,17 @@ class _CoreUIInputCalendarState extends State<CoreUIInputCalendar> {
   final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   Color currentColor = AppColors.gray40Color;
   String? errorText;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (this.widget.textEditingController.text != '') {
+      this.widget.textViewController.text = PipesDate.epochToDateFormat(
+          int.parse(widget.textEditingController.text), -5,
+          format: 'dd MMM yyyy');
+    }
+  }
 
   String? onCheckValidators(String? value) {
     if (value == null) return value;
@@ -101,6 +114,7 @@ class _CoreUIInputCalendarState extends State<CoreUIInputCalendar> {
       child: TextFormField(
         key: formKey,
         controller: this.widget.textViewController,
+        obscureText: this.widget.obscureText,
         enabled: false,
         style: AppFonts.labelTextLight(
             color: AppColors.gray40Color, fontFamily: 'Roboto'),
