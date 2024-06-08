@@ -27,7 +27,12 @@ class CustomersDomainService {
   static final CustomersSDKService _customersSDKService =
       CustomersSDKService.customersSDKService;
 
+  //+ Servicio del toast
   static final ToastService _toastService = ToastService.toastService;
+
+  //+ Obtenemos la instancia del servicio de secure storage
+  static final FlutterSecureStorageService flutterSecureStorageService =
+      FlutterSecureStorageService.flutterSecureStorageService;
 
   //+ Constructor nombrado
   CustomersDomainService._internal();
@@ -52,7 +57,7 @@ class CustomersDomainService {
           .customersNewItem(headers: headers, body: body);
 
       //+ Obtenemos la sesión
-      final Session sesion = Session.fromJson(response.session);
+      final Session session = Session.fromJson(response.session);
 
       //+ Obtenemos el customer
       final Customer customer = Customer.fromJson(response.item);
@@ -63,12 +68,8 @@ class CustomersDomainService {
       //+ Actualizamos el estado en bloc
       customerBloc.customerLogin(customer);
 
-      //+ Obtenemos la instancia del servicio de secure storage
-      final FlutterSecureStorageService flutterSecureStorageService =
-          FlutterSecureStorageService.flutterSecureStorageService;
-
       //+ Guardamos el token
-      flutterSecureStorageService.saveData('session-token', sesion.token);
+      flutterSecureStorageService.saveData('session-token', session.token);
 
       //+ Navegamos al home
       if (onFinalizeFunc != null) {
@@ -83,7 +84,7 @@ class CustomersDomainService {
             ToastServiceType.SUCCESS);
       }
       //+ Parseamos los customers
-      return CustomersNewItem(item: customer, session: sesion);
+      return CustomersNewItem(item: customer, session: session);
     } on SDKDataError catch (e) {
       switch (e.data.messageId) {
         case "ERR_CUSTOMER_EMAIL_ALREADY_EXISTS":
@@ -148,10 +149,6 @@ class CustomersDomainService {
       //+ Actualizamos el estado en bloc
       customerBloc.customerLogin(sessionLogin.customer);
 
-      //+ Obtenemos la instancia del servicio de secure storage
-      final FlutterSecureStorageService flutterSecureStorageService =
-          FlutterSecureStorageService.flutterSecureStorageService;
-
       //+ Guardamos el token
       flutterSecureStorageService.saveData(
           'session-token', sessionLogin.item.token);
@@ -167,6 +164,52 @@ class CustomersDomainService {
     } catch (error) {
       _toastService.showToast(context, '¡Ups! Error inesperado',
           'Vuelva a intentarlo en unos segundos.', ToastServiceType.ERROR);
+    }
+  }
+
+  //+ Obtener información de la sesión
+  Future<dynamic> sessionsInfo({required BuildContext context}) async {
+    try {
+      //+ Obtenemos el token de la sesión
+      final String? token =
+          await flutterSecureStorageService.getData('session-token');
+
+      //+ Verificamos si no tiene token
+      if (token == null) {
+        throw Error();
+      }
+
+      //+ Construimos el mapa de los headers
+      final Map<String, String> headers = {'token': token};
+
+      //+ Obtenemos los productos
+      final SDKSessionsInfo response =
+          await _customersSDKService.sessionsInfo(headers: headers);
+
+      //+ Parseamos los customers
+      final sessionInfo = SessionInfo(
+          item: Session.fromJson(response.item),
+          customer: Customer.fromJson(response.customer));
+
+      _toastService.showToast(
+          context,
+          '¡Bienvenido ${sessionInfo.customer.firstName}!',
+          'Explora ya mismo nuestro catálogo de productos.',
+          ToastServiceType.SUCCESS);
+
+      //+ Bloc de categorías
+      final CustomerBloc customerBloc = BlocProvider.of<CustomerBloc>(context);
+
+      //+ Actualizamos el estado en bloc
+      customerBloc.customerLogin(sessionInfo.customer);
+
+      //+ Guardamos el token
+      flutterSecureStorageService.saveData(
+          'session-token', sessionInfo.item.token);
+
+      return sessionInfo;
+    } catch (error) {
+      return null;
     }
   }
 }

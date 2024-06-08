@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 class Customer {
+  int customerId;
   String firstName;
   String lastName;
   String identId;
@@ -12,6 +13,7 @@ class Customer {
   int insTimestamp;
 
   Customer({
+    required this.customerId,
     required this.firstName,
     required this.lastName,
     required this.identId,
@@ -24,6 +26,7 @@ class Customer {
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
+        customerId: json["customerId"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         identId: json["identId"],
@@ -36,6 +39,7 @@ class Customer {
       );
 
   Map<String, dynamic> toJson() => {
+        "customerId": customerId,
         "firstName": firstName,
         "lastName": lastName,
         "identId": identId,
@@ -92,6 +96,16 @@ class SessionLogin {
   late Customer customer;
 
   SessionLogin({
+    required this.item,
+    required this.customer,
+  });
+}
+
+class SessionInfo {
+  late Session item;
+  late Customer customer;
+
+  SessionInfo({
     required this.item,
     required this.customer,
   });

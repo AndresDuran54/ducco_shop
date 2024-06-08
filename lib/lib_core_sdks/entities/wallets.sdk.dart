@@ -1,41 +1,33 @@
 // ignore_for_file: non_constant_identifier_names, prefer_initializing_formals
 
-//+ CUSTOMERS
-class SDKCustomersNewItem {
-  late dynamic item;
-  late dynamic session;
+//+ PAYMENT METHODS
+class SDKPaymentMethodsGetItems {
+  late List<dynamic> items;
 
-  SDKCustomersNewItem({
-    required this.item,
-    required this.session,
+  SDKPaymentMethodsGetItems({
+    required this.items,
   });
 }
 
-class SDKCustomersNewItemError extends Error {
-  SDKCustomersNewItemError();
-}
-
-//+ SESSIONS
-class SDKSessionsLogin {
+//+ ORDERS
+class SDKOrdersNewItem {
   late dynamic item;
-  late dynamic customer;
 
-  SDKSessionsLogin({
+  SDKOrdersNewItem({
     required this.item,
-    required this.customer,
   });
 }
 
-class SDKSessionsInfo {
+//+ PARAMETERS
+class SDKParametersItem {
   late dynamic item;
-  late dynamic customer;
 
-  SDKSessionsInfo({
+  SDKParametersItem({
     required this.item,
-    required this.customer,
   });
 }
 
+//+ ERRORS
 class SDKDataError {
   DataError data;
 

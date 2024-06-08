@@ -33,6 +33,7 @@ class CategoriesBodyOverview extends StatelessWidget {
     final navigationModel = Provider.of<NavigationModel>(context);
 
     return PageView(
+      physics: const NeverScrollableScrollPhysics(),
       controller: navigationModel.pageController,
       children: const <Widget>[
         ScreenCategoriesOverview(),

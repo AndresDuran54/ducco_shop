@@ -34,7 +34,7 @@ class ProductsDomainService {
         itemsCounterTotal: response.itemsCounterTotal,
       );
     } catch (error) {
-      throw ProductsGetItemsError(error.toString());
+      return ProductsGetItems(items: [], itemsCounter: 0, itemsCounterTotal: 0);
     }
   }
 }

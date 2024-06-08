@@ -1,4 +1,5 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_core_domain/domain/customers_domain.dart';
 import 'package:flutter/material.dart';
 
 //+ EXTERNAL
@@ -24,27 +25,26 @@ class Overview extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
 
     return ChangeNotifierProvider(
-      create: (BuildContext context) => new NavigationModel(),
-      child: Scaffold(
-        backgroundColor: AppColors.primary10Color,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              const Image(
-                image: AssetImage('assets/images/logo_only.png'),
-                width: 35,
-              ),
-              InputSearchOverview(size: size)
-            ],
+        create: (BuildContext context) => new NavigationModel(),
+        child: Scaffold(
+          backgroundColor: AppColors.primary10Color,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Image(
+                  image: AssetImage('assets/images/logo_only.png'),
+                  width: 35,
+                ),
+                InputSearchOverview(size: size)
+              ],
+            ),
+            backgroundColor: AppColors.gray15Color,
           ),
-          backgroundColor: AppColors.gray15Color,
-        ),
-        body: const BodyOverview(),
-        bottomNavigationBar: const NavigationBarOverview(),
-      ),
-    );
+          body: const BodyOverview(),
+          bottomNavigationBar: const NavigationBarOverview(),
+        ));
   }
 }
 

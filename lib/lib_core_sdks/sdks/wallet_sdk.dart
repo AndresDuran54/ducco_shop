@@ -2,90 +2,94 @@
 import 'dart:convert';
 
 import 'package:ducco_shop/lib_core_domain/domain/env_domain.dart';
-import 'package:ducco_shop/lib_core_sdks/entities/customers.sdk.dart';
+import 'package:ducco_shop/lib_core_sdks/entities/wallets.sdk.dart';
 
 //+ SHARES
 import 'package:ducco_shop/lib_shares/services/http-client.service.dart';
 
-class CustomersSDKService {
+class WalletSDKService {
   //+ Instancia de dio
   static final HttpClientService _httpClientService =
       HttpClientService.httpClientService;
 
   //+ Constructor nombrado
-  CustomersSDKService._internal();
+  WalletSDKService._internal();
 
   //+ Instancia única de la clase
-  static final CustomersSDKService _customersSDKService =
-      CustomersSDKService._internal();
+  static final WalletSDKService _walletSDKService =
+      WalletSDKService._internal();
 
   //+ Getter para la instancia única
-  static CustomersSDKService get customersSDKService => _customersSDKService;
+  static WalletSDKService get walletSDKService => _walletSDKService;
 
   //+ URLS del microservicio
   final Map<String, Map<String, String>> urls = {
-    //+ CUSTOMERS
-    'customers': {'newItem': '${env.MICROS.CUSTOMERS.HOST}/v1/customers'},
-    //+ SESSIONS
-    'sessions': {
-      'login': '${env.MICROS.CUSTOMERS.HOST}/v1/sessions/login',
-      'info': '${env.MICROS.CUSTOMERS.HOST}/v1/sessions/info'
+    //+ PAYMENT METHODS
+    'payment-methods': {
+      'getItems': '${env.MICROS.WALLET.HOST}/v1/payment-methods'
     },
+    //+ ORDERS
+    'orders': {'newItem': '${env.MICROS.WALLET.HOST}/v1/orders'},
+    //+ PARAMETERS
+    'parameters': {'getItem': '${env.MICROS.WALLET.HOST}/v1/parameters'},
   };
 
-  //+ Crear un nuevo cliente
-  Future<SDKCustomersNewItem> customersNewItem(
+  //+ PAYMENT METHODS
+
+  //+ Obtener los métodos de pago
+  Future<dynamic> paymentMethodsItems({Map<String, String>? headers}) async {
+    try {
+      //+ Obtenemos los registro de los productos
+      final response = await _httpClientService
+          .get('${urls['payment-methods']!['getItems']}', headers: headers);
+
+      //+ Construimos la response
+      return SDKPaymentMethodsGetItems(
+        items: response.body['data']['items'],
+      );
+    } on HttpError catch (e) {
+      throw new SDKDataError.fromJson(json.decode(e.data));
+    } catch (error) {
+      throw new SDKDataError.fromJson(json.decode(error.toString()));
+    }
+  }
+
+  //+ ORDERS
+
+  //+ Realizar nuevo pedido
+  Future<dynamic> ordersNewItem(
+      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
+    try {
+      //+ Obtenemos los registro de los productos
+      final response = await _httpClientService
+          .post('${urls['orders']!['newItem']}', headers: headers, body: body);
+
+      //+ Construimos la response
+      return SDKOrdersNewItem(
+        item: response.body['data']['item'],
+      );
+    } on HttpError catch (e) {
+      throw new SDKDataError.fromJson(json.decode(e.data));
+    } catch (error) {
+      throw new SDKDataError.fromJson(json.decode(error.toString()));
+    }
+  }
+
+  //+ PARAMETERS
+
+  //+ Obtener el registro de un parámetro
+  Future<dynamic> parameterItem(
       {Map<String, String>? headers, Map<String, dynamic>? body}) async {
     try {
       //+ Obtenemos los registro de los productos
       final response = await _httpClientService.post(
-          '${urls['customers']!['newItem']}',
+          '${urls['parameters']!['getItem']}',
           headers: headers,
           body: body);
 
       //+ Construimos la response
-      return SDKCustomersNewItem(
+      return SDKParametersItem(
         item: response.body['data']['item'],
-        session: response.body['data']['session'],
-      );
-    } on HttpError catch (e) {
-      throw new SDKDataError.fromJson(json.decode(e.data));
-    } catch (error) {
-      throw new SDKDataError.fromJson(json.decode(error.toString()));
-    }
-  }
-
-  //+ Loguearte
-  Future<SDKSessionsLogin> sessionsLogin(
-      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
-    try {
-      //+ Obtenemos los registro de los productos
-      final response = await _httpClientService
-          .post('${urls['sessions']!['login']}', headers: headers, body: body);
-
-      //+ Construimos la response
-      return SDKSessionsLogin(
-        item: response.body['data']['item'],
-        customer: response.body['data']['customer'],
-      );
-    } on HttpError catch (e) {
-      throw new SDKDataError.fromJson(json.decode(e.data));
-    } catch (error) {
-      throw new SDKDataError.fromJson(json.decode(error.toString()));
-    }
-  }
-
-  //+ Obtener información de la sesión
-  Future<SDKSessionsInfo> sessionsInfo({Map<String, String>? headers}) async {
-    try {
-      //+ Obtenemos los registro de los productos
-      final response = await _httpClientService
-          .post('${urls['sessions']!['info']}', headers: headers);
-
-      //+ Construimos la response
-      return SDKSessionsInfo(
-        item: response.body['data']['item'],
-        customer: response.body['data']['customer'],
       );
     } on HttpError catch (e) {
       throw new SDKDataError.fromJson(json.decode(e.data));

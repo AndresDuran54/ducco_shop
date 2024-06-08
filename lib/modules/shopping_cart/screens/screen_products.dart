@@ -130,7 +130,7 @@ class ScreenProductsResume extends StatelessWidget {
                   style: AppFonts.subTitle2Heavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
               Text(
-                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(0, 2)}',
+                  '${env.MICROS.PRODUCTS.VARS.CURRENCY_SYMBOL} ${PipesNumber.unitsToDecimal(500, 2)}',
                   style: AppFonts.labelTextHeavy(
                       color: AppColors.gray100Color, fontFamily: 'Ubuntu')),
             ],

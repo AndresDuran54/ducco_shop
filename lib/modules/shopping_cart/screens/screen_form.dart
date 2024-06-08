@@ -1,5 +1,7 @@
 //+ FLUTTER
+import 'package:ducco_shop/lib_bloc/module.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 //+ DEPENDENCIES
 import 'package:provider/provider.dart';
@@ -36,8 +38,6 @@ class ScreenFormState extends State<ScreenForm> {
   }
 
   //+ Forms Global Keys
-  final GlobalKey<FormState> formKeyUserData = GlobalKey<FormState>();
-  final GlobalKey<FormState> formKeyDeliveryData = GlobalKey<FormState>();
   int formKeyPaymentMethod = 1;
 
   @override
@@ -51,18 +51,60 @@ class ScreenFormState extends State<ScreenForm> {
     //+ Inyectamos el navigationModel
     final navigationModel = Provider.of<NavigationModel>(context);
 
+    //+ Customer Bloc
+    final CustomerBloc customerBloc = BlocProvider.of<CustomerBloc>(context);
+
+    //+ Controladores para el formulario de información personal
+    final GlobalKey<FormState> formKeyUserData = new GlobalKey();
+    final TextEditingController identCtrl =
+        new TextEditingController(text: customerBloc.state.customer!.identId);
+    final TextEditingController identificationCtrl = new TextEditingController(
+        text: customerBloc.state.customer!.identification);
+    final TextEditingController emailCtrl =
+        new TextEditingController(text: customerBloc.state.customer!.email);
+    final TextEditingController firstNameCtrl =
+        new TextEditingController(text: customerBloc.state.customer!.firstName);
+    final TextEditingController lastNameCtrl =
+        new TextEditingController(text: customerBloc.state.customer!.lastName);
+    final TextEditingController phoneCtrl = new TextEditingController(
+        text: customerBloc.state.customer!.phoneNumber);
+
+    //+ Controladores para el formulario de dirección de entrega
+    final GlobalKey<FormState> formKeyDeliveryData = new GlobalKey();
+    final TextEditingController deliveryAddressCtrl =
+        new TextEditingController();
+    final TextEditingController districtAddressCtrl =
+        new TextEditingController();
+    final TextEditingController floorOrApartmentAddressCtrl =
+        new TextEditingController();
+    final TextEditingController referenceAddressCtrl =
+        new TextEditingController();
+
     return Theme(
       data: ThemeData(
         colorScheme:
-            const ColorScheme.light(primary: AppColors.secondary50Color),
+            const ColorScheme.light(primary: AppColors.secondary80Color),
       ),
       child: Stepper(
         type: stepperType,
         physics: const BouncingScrollPhysics(),
         currentStep: this.currentStep,
         steps: <Step>[
-          buildStepUserData(),
-          buildStepDeliveryData(),
+          buildStepUserData(
+            formKeyUserData,
+            identCtrl,
+            identificationCtrl,
+            emailCtrl,
+            firstNameCtrl,
+            lastNameCtrl,
+            phoneCtrl,
+          ),
+          buildStepDeliveryData(
+              formKeyDeliveryData,
+              deliveryAddressCtrl,
+              districtAddressCtrl,
+              floorOrApartmentAddressCtrl,
+              referenceAddressCtrl),
           buildStepPayInMethods(),
         ],
         controlsBuilder:
@@ -80,14 +122,14 @@ class ScreenFormState extends State<ScreenForm> {
                     text: 'Anterior'),
                 const SizedBox(width: 16),
                 UIButton(
-                    onPressedFunc:
-                        (this.formKeyUserData.currentState?.validate() ?? false)
-                            ? () {
-                                setState(() {
-                                  this.currentStep = 1;
-                                });
-                              }
-                            : null,
+                    onPressedFunc: () {
+                      if (formKeyUserData.currentState != null &&
+                          formKeyUserData.currentState!.validate()) {
+                        setState(() {
+                          this.currentStep = 1;
+                        });
+                      }
+                    },
                     enabledColor: AppColors.secondary80Color,
                     disabledColor: AppColors.secondary20Color,
                     splashColor: AppColors.gray70Color,
@@ -100,15 +142,14 @@ class ScreenFormState extends State<ScreenForm> {
                         this.currentStep = 0;
                       });
                     },
-                    enabledColor: AppColors.gray40Color,
-                    disabledColor: AppColors.gray40Color,
+                    enabledColor: AppColors.gray50Color,
+                    disabledColor: AppColors.gray50Color,
                     splashColor: AppColors.gray70Color,
                     text: 'Anterior'),
                 const SizedBox(width: 16),
                 UIButton(
                     onPressedFunc:
-                        (this.formKeyDeliveryData.currentState?.validate() ??
-                                false)
+                        (formKeyDeliveryData.currentState?.validate() ?? false)
                             ? () {
                                 setState(() {
                                   this.currentStep = 2;
@@ -128,15 +169,14 @@ class ScreenFormState extends State<ScreenForm> {
                         navigationModel.actualPage = 2;
                       });
                     },
-                    enabledColor: AppColors.gray40Color,
-                    disabledColor: AppColors.gray40Color,
+                    enabledColor: AppColors.gray50Color,
+                    disabledColor: AppColors.gray50Color,
                     splashColor: AppColors.gray70Color,
                     text: 'Anterior'),
                 const SizedBox(width: 16),
                 UIButton(
                     onPressedFunc:
-                        (this.formKeyDeliveryData.currentState?.validate() ??
-                                false)
+                        (formKeyDeliveryData.currentState?.validate() ?? false)
                             ? () {
                                 navigationModel.actualPage = 2;
                               }
@@ -153,7 +193,15 @@ class ScreenFormState extends State<ScreenForm> {
     );
   }
 
-  Step buildStepUserData() {
+  Step buildStepUserData(
+    GlobalKey<FormState> keyForm,
+    TextEditingController identCtrl,
+    TextEditingController identificationCtrl,
+    TextEditingController emailCtrl,
+    TextEditingController firstNameCtrl,
+    TextEditingController lastNameCtrl,
+    TextEditingController phoneCtrl,
+  ) {
     return new Step(
       title: Text('Información personal',
           style: AppFonts.subTitleHeavy(
@@ -162,10 +210,7 @@ class ScreenFormState extends State<ScreenForm> {
                   : AppColors.gray60Color,
               fontFamily: 'Roboto')),
       content: Form(
-        key: this.formKeyUserData,
-        onChanged: () {
-          setState(() {});
-        },
+        key: keyForm,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -176,6 +221,7 @@ class ScreenFormState extends State<ScreenForm> {
                 child: CoreUIInputSelect(
                   optionsList: this.documentOptions,
                   value: "DNI",
+                  textEditingController: identCtrl,
                 )),
             const SizedBox(height: 14),
             //+ Identificación
@@ -186,15 +232,19 @@ class ScreenFormState extends State<ScreenForm> {
                 AppInputTextValidators.checkRequired(
                     errorMsg: 'La identificación es requerida')
               ],
+              textEditingController: identificationCtrl,
             ),
             const SizedBox(height: 14),
             //+ Correo electrónico
-            CoreUIInputText(labelText: 'Correo electrónico', validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'El correo electrónico es requerido'),
-              AppInputTextValidators.checkEmail(
-                  errorMsg: 'Ingrese un formato de correo correcto'),
-            ]),
+            CoreUIInputText(
+                labelText: 'Correo electrónico',
+                validators: [
+                  AppInputTextValidators.checkRequired(
+                      errorMsg: 'El correo electrónico es requerido'),
+                  AppInputTextValidators.checkEmail(
+                      errorMsg: 'Ingrese un formato de correo correcto'),
+                ],
+                textEditingController: emailCtrl),
             const SizedBox(height: 14),
             //+ Nombres
             CoreUIInputText(
@@ -205,6 +255,7 @@ class ScreenFormState extends State<ScreenForm> {
                 AppInputTextValidators.checkText(
                     errorMsg: 'Los nombres solo deben contener letras')
               ],
+              textEditingController: firstNameCtrl,
             ),
             const SizedBox(height: 14),
             //+ Apellidos
@@ -216,6 +267,7 @@ class ScreenFormState extends State<ScreenForm> {
                 AppInputTextValidators.checkText(
                     errorMsg: 'Los apellidos solo deben contener letras')
               ],
+              textEditingController: lastNameCtrl,
             ),
             const SizedBox(height: 14),
             //+ Número celular
@@ -226,6 +278,7 @@ class ScreenFormState extends State<ScreenForm> {
                 AppInputTextValidators.checkRequired(
                     errorMsg: 'El número celular es requerido')
               ],
+              textEditingController: phoneCtrl,
             ),
             const SizedBox(height: 16),
           ],
@@ -236,16 +289,21 @@ class ScreenFormState extends State<ScreenForm> {
     );
   }
 
-  Step buildStepDeliveryData() {
+  Step buildStepDeliveryData(
+      GlobalKey<FormState> keyForm,
+      TextEditingController deliveryAddressCtrl,
+      TextEditingController districtAddressCtrl,
+      TextEditingController floorOrApartmentAddressCtrl,
+      TextEditingController referenceAddressCtrl) {
     return new Step(
-      title: Text('Información personal',
+      title: Text('Información de entrega',
           style: AppFonts.subTitleHeavy(
               color: (this.currentStep == 1)
                   ? AppColors.gray90Color
                   : AppColors.gray60Color,
               fontFamily: 'Roboto')),
       content: Form(
-        key: this.formKeyDeliveryData,
+        key: keyForm,
         onChanged: () {
           setState(() {});
         },
@@ -260,22 +318,28 @@ class ScreenFormState extends State<ScreenForm> {
                 AppInputTextValidators.checkRequired(
                     errorMsg: 'La dirección de entrega es requerida')
               ],
+              textEditingController: deliveryAddressCtrl,
             ),
             const SizedBox(height: 14),
             //+ Distrito
-            CoreUIInputText(labelText: 'Distrito', validators: [
-              AppInputTextValidators.checkRequired(
-                  errorMsg: 'El distrito es requerido'),
-            ]),
+            CoreUIInputText(
+                labelText: 'Distrito',
+                validators: [
+                  AppInputTextValidators.checkRequired(
+                      errorMsg: 'El distrito es requerido'),
+                ],
+                textEditingController: districtAddressCtrl),
             const SizedBox(height: 14),
             //+ Nombres
             CoreUIInputText(
               labelText: 'Piso o departamento (Opcional)',
+              textEditingController: floorOrApartmentAddressCtrl,
             ),
             const SizedBox(height: 14),
             //+ Nombres
             CoreUIInputText(
               labelText: 'Referencia (Opcional)',
+              textEditingController: referenceAddressCtrl,
             ),
             const SizedBox(height: 16),
           ],

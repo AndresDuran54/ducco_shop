@@ -4,7 +4,6 @@ import 'package:ducco_shop/lib_core_domain/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_toast/module.dart';
-import 'package:ducco_shop/lib_core_ui/ui_toast/organism/toast_confirm.dart';
 import 'package:ducco_shop/lib_shares/services/toast.service.dart';
 import 'package:ducco_shop/utils/colors/colors.dart';
 import 'package:ducco_shop/utils/fonts/fonts.dart';

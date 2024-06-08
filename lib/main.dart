@@ -1,4 +1,5 @@
 import 'package:ducco_shop/lib_bloc/module.dart';
+import 'package:ducco_shop/modules/auth/info/info.dart';
 import 'package:ducco_shop/modules/auth/login/login.dart';
 import 'package:ducco_shop/modules/overview.dart';
 import 'package:flutter/material.dart';
@@ -24,20 +25,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ducco Shop',
-      initialRoute: '/home/overview',
+      initialRoute: '/auth/info',
       debugShowCheckedModeBanner: false,
       routes: {
         /* 
-          AUTH
-        */
+              FUTURE BUILDER
+            */
+        '/auth/info': (BuildContext context) => const FutureSessionInfoScreen(),
+        /* 
+              AUTH
+            */
         '/auth/login': (BuildContext context) => const LoginScreen(),
         /*
-          HOME
-        */
+              HOME
+            */
         '/home/overview': (BuildContext context) => const Overview(),
         /*
-          HOME
-        */
+              HOME
+            */
         '/home/product_detail': (BuildContext context) =>
             const ProductDetailScreen(),
       },

@@ -109,16 +109,6 @@ class ScreenCategoriesCard extends StatelessWidget {
             ),
             textAlign: TextAlign.start,
           ),
-          Text(
-            this.category.cardSubTitleFo,
-            style: const TextStyle(
-              color: AppColors.gray50Color,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.start,
-          ),
         ],
       ),
       FadeInImage(
@@ -149,7 +139,7 @@ class ScreenCategoriesCard extends StatelessWidget {
                 height: 100,
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.secondary50Color,
+                      color: AppColors.secondary40Color,
                       borderRadius:
                           BorderRadius.only(bottomRight: Radius.circular(95))),
                 ),
@@ -163,7 +153,7 @@ class ScreenCategoriesCard extends StatelessWidget {
                 height: 100,
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.surface10Color,
+                      color: AppColors.gray25Color,
                       borderRadius: BorderRadius.only(
                           bottomRight: Radius.circular(12),
                           topLeft: Radius.circular(95))),
