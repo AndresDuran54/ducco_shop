@@ -1,7 +1,16 @@
 // ignore_for_file: non_constant_identifier_names
 
+class IEnvDomainMicrosWalletVarsParameters {
+  final String ORDERS_DEFAULT_DELIVERY_PRICE;
+
+  const IEnvDomainMicrosWalletVarsParameters(
+      {required this.ORDERS_DEFAULT_DELIVERY_PRICE});
+}
+
 class IEnvDomainMicrosWalletVars {
-  const IEnvDomainMicrosWalletVars();
+  final IEnvDomainMicrosWalletVarsParameters PARAMETERS;
+
+  const IEnvDomainMicrosWalletVars({required this.PARAMETERS});
 }
 
 class IEnvDomainMicrosWallet {

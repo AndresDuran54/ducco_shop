@@ -62,7 +62,7 @@ class CustomersDomainService {
       //+ Obtenemos el customer
       final Customer customer = Customer.fromJson(response.item);
 
-      //+ Bloc de categorías
+      //+ Bloc de customer
       final CustomerBloc customerBloc = BlocProvider.of<CustomerBloc>(context);
 
       //+ Actualizamos el estado en bloc

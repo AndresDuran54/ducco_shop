@@ -17,6 +17,9 @@ import 'package:ducco_shop/lib_shares/services/providers/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_buttons/module.dart';
 import 'package:ducco_shop/lib_core_ui/ui_inputs/module.dart';
 
+//+ LIB DOMAIN
+import 'package:ducco_shop/lib_core_domain/module.dart';
+
 class ScreenForm extends StatefulWidget {
   const ScreenForm({super.key});
 
@@ -33,7 +36,6 @@ class ScreenFormState extends State<ScreenForm> {
   List<DropdownMenuItem<String>> get documentOptions {
     return const [
       DropdownMenuItem(value: "DNI", child: Text("DNI")),
-      DropdownMenuItem(value: "CTX", child: Text("CTX")),
     ];
   }
 
@@ -54,6 +56,14 @@ class ScreenFormState extends State<ScreenForm> {
     //+ Customer Bloc
     final CustomerBloc customerBloc = BlocProvider.of<CustomerBloc>(context);
 
+    //+ Shopping Cart Bloc
+    final ShoppingCartBloc shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
+
+    //+ Controlador Wallet
+    WalletDomainService walletDomainService =
+        WalletDomainService.walletDomainService;
+
     //+ Controladores para el formulario de información personal
     final GlobalKey<FormState> formKeyUserData = new GlobalKey();
     final TextEditingController identCtrl =
@@ -71,14 +81,17 @@ class ScreenFormState extends State<ScreenForm> {
 
     //+ Controladores para el formulario de dirección de entrega
     final GlobalKey<FormState> formKeyDeliveryData = new GlobalKey();
-    final TextEditingController deliveryAddressCtrl =
-        new TextEditingController();
-    final TextEditingController districtAddressCtrl =
-        new TextEditingController();
+    final TextEditingController deliveryAddressCtrl = new TextEditingController(
+        text: shoppingCartBloc.state.orderAddressCustomer?.address ?? '');
+    final TextEditingController districtAddressCtrl = new TextEditingController(
+        text: shoppingCartBloc.state.orderAddressCustomer?.district ?? '');
     final TextEditingController floorOrApartmentAddressCtrl =
-        new TextEditingController();
+        new TextEditingController(
+            text: shoppingCartBloc.state.orderAddressCustomer?.floorApartment ??
+                '');
     final TextEditingController referenceAddressCtrl =
-        new TextEditingController();
+        new TextEditingController(
+            text: shoppingCartBloc.state.orderAddressCustomer?.reference ?? '');
 
     return Theme(
       data: ThemeData(
@@ -105,7 +118,7 @@ class ScreenFormState extends State<ScreenForm> {
               districtAddressCtrl,
               floorOrApartmentAddressCtrl,
               referenceAddressCtrl),
-          buildStepPayInMethods(),
+          buildStepPayInMethods(shoppingCartBloc),
         ],
         controlsBuilder:
             (BuildContext context, ControlsDetails controlsDetails) {
@@ -125,6 +138,8 @@ class ScreenFormState extends State<ScreenForm> {
                     onPressedFunc: () {
                       if (formKeyUserData.currentState != null &&
                           formKeyUserData.currentState!.validate()) {
+                        Customer customer = customerBloc.state.customer!;
+                        shoppingCartBloc.setCustomer(customer);
                         setState(() {
                           this.currentStep = 1;
                         });
@@ -148,14 +163,40 @@ class ScreenFormState extends State<ScreenForm> {
                     text: 'Anterior'),
                 const SizedBox(width: 16),
                 UIButton(
-                    onPressedFunc:
-                        (formKeyDeliveryData.currentState?.validate() ?? false)
-                            ? () {
-                                setState(() {
-                                  this.currentStep = 2;
-                                });
-                              }
-                            : null,
+                    onPressedFunc: () async {
+                      if (formKeyDeliveryData.currentState != null &&
+                          formKeyDeliveryData.currentState!.validate()) {
+                        //+ Creamos el objeto para guardar la dirección del customer
+                        OrderAddressCustomer orderAddressCustomer =
+                            new OrderAddressCustomer(
+                                address: deliveryAddressCtrl.text,
+                                district: districtAddressCtrl.text,
+                                floorApartment:
+                                    floorOrApartmentAddressCtrl.text,
+                                reference: referenceAddressCtrl.text);
+
+                        //+ Guardamos la dirección del customer
+                        shoppingCartBloc
+                            .setOrderAddressCustomer(orderAddressCustomer);
+
+                        //+ Obtenemos los métodos de pago
+                        PaymentMethodsItems paymentMethodsItems =
+                            await walletDomainService.paymentMethodsGetItems(
+                                context: context);
+
+                        //+ Asignamos los métodos de pago
+                        shoppingCartBloc
+                            .setPaymentMethods(paymentMethodsItems.items);
+
+                        //+ Definimos el método de pago por defecto
+                        shoppingCartBloc.setPaymentMethodId(shoppingCartBloc
+                            .state.paymentMethods![0].paymentMethodId);
+
+                        setState(() {
+                          this.currentStep = 2;
+                        });
+                      }
+                    },
                     enabledColor: AppColors.secondary80Color,
                     disabledColor: AppColors.secondary20Color,
                     splashColor: AppColors.gray70Color,
@@ -165,8 +206,7 @@ class ScreenFormState extends State<ScreenForm> {
                 UIButton(
                     onPressedFunc: () {
                       setState(() {
-                        // this.currentStep = 1;
-                        navigationModel.actualPage = 2;
+                        this.currentStep = 1;
                       });
                     },
                     enabledColor: AppColors.gray50Color,
@@ -175,12 +215,38 @@ class ScreenFormState extends State<ScreenForm> {
                     text: 'Anterior'),
                 const SizedBox(width: 16),
                 UIButton(
-                    onPressedFunc:
-                        (formKeyDeliveryData.currentState?.validate() ?? false)
-                            ? () {
-                                navigationModel.actualPage = 2;
-                              }
-                            : null,
+                    onPressedFunc: () {
+                      if (formKeyDeliveryData.currentState != null &&
+                          formKeyDeliveryData.currentState!.validate()) {
+                        setState(() {
+                          walletDomainService
+                              .ordersNewItem(context: context, body: {
+                            "ordersDetails": shoppingCartBloc.state.products
+                                .map((p) => {
+                                      "productId": p.product.productId,
+                                      "quantity": p.quantity
+                                    })
+                                .toList(),
+                            "addressCustomer": {
+                              "address": shoppingCartBloc
+                                      .state.orderAddressCustomer?.address ??
+                                  '',
+                              "district": shoppingCartBloc
+                                      .state.orderAddressCustomer?.district ??
+                                  '',
+                              "floorApartment": shoppingCartBloc.state
+                                      .orderAddressCustomer?.floorApartment ??
+                                  '',
+                              "reference": shoppingCartBloc
+                                      .state.orderAddressCustomer?.reference ??
+                                  '',
+                            },
+                            "paymentMethodId":
+                                shoppingCartBloc.state.paymentMethodId
+                          });
+                        });
+                      }
+                    },
                     enabledColor: AppColors.secondary80Color,
                     disabledColor: AppColors.secondary20Color,
                     splashColor: AppColors.gray70Color,
@@ -206,7 +272,7 @@ class ScreenFormState extends State<ScreenForm> {
       title: Text('Información personal',
           style: AppFonts.subTitleHeavy(
               color: (this.currentStep == 0)
-                  ? AppColors.gray20Color
+                  ? AppColors.gray100Color
                   : AppColors.gray60Color,
               fontFamily: 'Roboto')),
       content: Form(
@@ -230,21 +296,24 @@ class ScreenFormState extends State<ScreenForm> {
               textInputType: TextInputType.number,
               validators: [
                 AppInputTextValidators.checkRequired(
-                    errorMsg: 'La identificación es requerida')
+                    errorMsg: 'La identificación es requerida'),
               ],
               textEditingController: identificationCtrl,
+              readOnly: true,
             ),
             const SizedBox(height: 14),
             //+ Correo electrónico
             CoreUIInputText(
-                labelText: 'Correo electrónico',
-                validators: [
-                  AppInputTextValidators.checkRequired(
-                      errorMsg: 'El correo electrónico es requerido'),
-                  AppInputTextValidators.checkEmail(
-                      errorMsg: 'Ingrese un formato de correo correcto'),
-                ],
-                textEditingController: emailCtrl),
+              labelText: 'Correo electrónico',
+              validators: [
+                AppInputTextValidators.checkRequired(
+                    errorMsg: 'El correo electrónico es requerido'),
+                AppInputTextValidators.checkEmail(
+                    errorMsg: 'Ingrese un formato de correo correcto'),
+              ],
+              textEditingController: emailCtrl,
+              readOnly: true,
+            ),
             const SizedBox(height: 14),
             //+ Nombres
             CoreUIInputText(
@@ -256,6 +325,7 @@ class ScreenFormState extends State<ScreenForm> {
                     errorMsg: 'Los nombres solo deben contener letras')
               ],
               textEditingController: firstNameCtrl,
+              readOnly: true,
             ),
             const SizedBox(height: 14),
             //+ Apellidos
@@ -268,6 +338,7 @@ class ScreenFormState extends State<ScreenForm> {
                     errorMsg: 'Los apellidos solo deben contener letras')
               ],
               textEditingController: lastNameCtrl,
+              readOnly: true,
             ),
             const SizedBox(height: 14),
             //+ Número celular
@@ -279,6 +350,7 @@ class ScreenFormState extends State<ScreenForm> {
                     errorMsg: 'El número celular es requerido')
               ],
               textEditingController: phoneCtrl,
+              readOnly: true,
             ),
             const SizedBox(height: 16),
           ],
@@ -299,14 +371,11 @@ class ScreenFormState extends State<ScreenForm> {
       title: Text('Información de entrega',
           style: AppFonts.subTitleHeavy(
               color: (this.currentStep == 1)
-                  ? AppColors.gray90Color
+                  ? AppColors.gray100Color
                   : AppColors.gray60Color,
               fontFamily: 'Roboto')),
       content: Form(
         key: keyForm,
-        onChanged: () {
-          setState(() {});
-        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -350,53 +419,64 @@ class ScreenFormState extends State<ScreenForm> {
     );
   }
 
-  Step buildStepPayInMethods() {
+  Step buildStepPayInMethods(ShoppingCartBloc shoppingCartBloc) {
     return Step(
       title: Text('Método de pago',
           style: AppFonts.subTitleHeavy(
               color: (this.currentStep == 2)
-                  ? AppColors.gray90Color
+                  ? AppColors.gray100Color
                   : AppColors.gray60Color,
               fontFamily: 'Roboto')),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          ListTile(
-            title: Text('Yape QR',
-                style: AppFonts.subTitleHeavy(
-                    color: AppColors.gray80Color, fontFamily: 'Roboto')),
-            leading: Radio<int>(
-              value: 1,
-              activeColor: AppColors.secondary60Color,
-              groupValue: this.formKeyPaymentMethod,
-              onChanged: (int? value) {
-                setState(() {
-                  if (value != null) {
-                    this.formKeyPaymentMethod = value;
-                  }
-                });
-              },
-            ),
-          ),
-          ListTile(
-            title: Text('Pago contra entrega',
-                style: AppFonts.subTitleHeavy(
-                    color: AppColors.gray80Color, fontFamily: 'Roboto')),
-            leading: Radio<int>(
-              value: 2,
-              activeColor: AppColors.secondary60Color,
-              groupValue: this.formKeyPaymentMethod,
-              onChanged: (int? value) {
-                setState(() {
-                  if (value != null) {
-                    this.formKeyPaymentMethod = value;
-                  }
-                });
-              },
-            ),
-          ),
-        ],
-      ),
+      content: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+          builder: (BuildContext context, ShoppingCartState state) {
+        if (state.paymentMethods != null && state.paymentMethods!.isNotEmpty) {
+          return Column(
+              children: state.paymentMethods!
+                  .map((PaymentMethod paymentMethod) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 65,
+                              child: FadeInImage(
+                                  width: 50,
+                                  placeholderFit: BoxFit.cover,
+                                  placeholder: const AssetImage(
+                                      'assets/gifs/loading.gif'),
+                                  fit: BoxFit.cover,
+                                  image:
+                                      NetworkImage(paymentMethod.cardImgUrlFo)),
+                            ),
+                            SizedBox(
+                              width: 250,
+                              child: ListTile(
+                                title: Text(paymentMethod.cardTitleFo,
+                                    style: AppFonts.labelTextLight(
+                                        color: AppColors.gray40Color,
+                                        fontFamily: 'Roboto')),
+                                leading: Radio<int>(
+                                  value: paymentMethod.paymentMethodId,
+                                  activeColor: AppColors.secondary60Color,
+                                  groupValue:
+                                      shoppingCartBloc.state.paymentMethodId,
+                                  onChanged: (int? value) {
+                                    setState(() {
+                                      if (value != null) {
+                                        shoppingCartBloc
+                                            .setPaymentMethodId(value);
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList());
+        }
+        return Container();
+      }),
       isActive: currentStep == 2,
       state: StepState.complete,
     );

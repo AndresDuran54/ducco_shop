@@ -89,7 +89,7 @@ class ScreenCategoriesCard extends StatelessWidget {
           Text(
             this.category.cardTitleFo,
             style: const TextStyle(
-              color: AppColors.secondary50Color,
+              color: AppColors.secondary60Color,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w600,
               fontSize: 22,
@@ -102,7 +102,7 @@ class ScreenCategoriesCard extends StatelessWidget {
           Text(
             this.category.cardSubTitleFo,
             style: const TextStyle(
-              color: AppColors.gray10Color,
+              color: AppColors.gray30Color,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -126,7 +126,7 @@ class ScreenCategoriesCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-            color: AppColors.gray90Color,
+            color: AppColors.gray100Color,
             borderRadius: BorderRadius.circular(8)),
         height: 180,
         child: Stack(
@@ -139,9 +139,10 @@ class ScreenCategoriesCard extends StatelessWidget {
                 height: 100,
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.secondary40Color,
-                      borderRadius:
-                          BorderRadius.only(bottomRight: Radius.circular(95))),
+                      color: AppColors.secondary60Color,
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(95),
+                          topLeft: Radius.circular(8))),
                 ),
               ),
             ],
@@ -153,9 +154,9 @@ class ScreenCategoriesCard extends StatelessWidget {
                 height: 100,
                 child: Container(
                   decoration: const BoxDecoration(
-                      color: AppColors.gray25Color,
+                      color: AppColors.secondary60Color,
                       borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(12),
+                          bottomRight: Radius.circular(8),
                           topLeft: Radius.circular(95))),
                 ),
               ),

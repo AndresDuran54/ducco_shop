@@ -27,7 +27,11 @@ class IEnvDomain {
 IEnvDomain env = const IEnvDomain(
     MICROS: IEnvDomainMicros(
         WALLET: IEnvDomainMicrosWallet(
-            HOST: 'http://127.0.0.1:8500', VARS: IEnvDomainMicrosWalletVars()),
+            HOST: 'http://10.0.2.2:8500',
+            VARS: IEnvDomainMicrosWalletVars(
+                PARAMETERS: IEnvDomainMicrosWalletVarsParameters(
+                    ORDERS_DEFAULT_DELIVERY_PRICE:
+                        'ORDERS_DEFAULT_DELIVERY_PRICE'))),
         PRODUCTS: IEnvDomainMicrosProducts(
             HOST: "http://10.0.2.2:8080",
             VARS: IEnvDomainMicrosProductsVars(CURRENCY_SYMBOL: 'S/.')),

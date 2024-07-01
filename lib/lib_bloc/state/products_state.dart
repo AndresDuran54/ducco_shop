@@ -1,4 +1,5 @@
 import 'package:ducco_shop/lib_core_domain/entities/products_domain.dart';
+import 'package:ducco_shop/lib_core_domain/module.dart';
 
 class ShoppingCardProducts {
   final Product product;
@@ -14,7 +15,21 @@ class ShoppingCardProducts {
 class ShoppingCartState {
   //+ Lista para almacenar los productos y la cantidad
   final List<ShoppingCardProducts> products;
+
+  //+ Monto total de los productos
   int subTotalAmount;
+
+  //+ Registro del customer
+  Customer? customer;
+
+  //+ Registro de la dirección del cliente
+  OrderAddressCustomer? orderAddressCustomer;
+
+  //+ Lista de los métodos de pago
+  List<PaymentMethod>? paymentMethods;
+
+  //+ Id del método de pago elegido
+  int? paymentMethodId;
 
   //+ Constructor
   ShoppingCartState({required this.products, this.subTotalAmount = 0});

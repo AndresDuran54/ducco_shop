@@ -165,10 +165,10 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               MaterialButton(
                 color: AppColors.secondary60Color,
-                onPressed: (() {
+                onPressed: (() async {
                   if (indexProduct == -1) {
-                    indexProduct = shoppingCartBloc.addProduct(
-                        shoppingCardProducts.product, 1);
+                    indexProduct = await shoppingCartBloc.addProduct(
+                        shoppingCardProducts.product, 1, context);
                   } else {
                     shoppingCartBloc.removeProduct(indexProduct);
                     indexProduct = -1;

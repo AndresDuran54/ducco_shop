@@ -339,7 +339,7 @@ class ScreenCategoriesResultHeader extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.black30Color,
+          color: AppColors.gray45Color,
           border: Border.all(width: 1, color: AppColors.gray10Color)),
       child: Column(
         children: <Widget>[

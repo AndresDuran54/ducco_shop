@@ -168,7 +168,7 @@ class OrderAddressCustomer {
 //+ PARAMETERS
 class Parameter {
   String paramId;
-  int value;
+  dynamic value;
   String description;
   int type;
   int insTimestamp;

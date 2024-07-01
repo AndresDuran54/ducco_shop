@@ -1,6 +1,27 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_interceptor/http_interceptor.dart';
+
+class MyInterceptor implements InterceptorContract {
+  final BuildContext context;
+
+  MyInterceptor({required this.context});
+
+  @override
+  Future<RequestData> interceptRequest({required RequestData data}) async {
+    return data;
+  }
+
+  @override
+  Future<ResponseData> interceptResponse({required ResponseData data}) async {
+    if (data.statusCode == 401) {
+      print("401");
+    }
+    return data;
+  }
+}
 
 class GetResponse {
   final Map<String, dynamic> body;
@@ -15,39 +36,33 @@ class PostResponse {
 }
 
 class HttpClientService {
-  //+ Instancia de dio
-  // late Dio _dio;
+  //+ Referencia de Build Context
+  late BuildContext context;
+
+  //+ Cliente HTTP
+  static late http.Client client;
+
+  //+ Método para iniciar el cliente HTTP
+  static start(BuildContext context) {
+    //+ Inicializamos el cliente
+    client = InterceptedClient.build(
+      interceptors: [MyInterceptor(context: context)],
+    );
+
+    //+ Inicializamos la instancia Singleton
+    _httpClientService = HttpClientService._internal(context);
+  }
 
   //+ Constructor nombrado
-  HttpClientService._internal() {
-    // _dio = Dio();
+  HttpClientService._internal(BuildContext context) {
+    context = context;
   }
 
   //+ Instancia única de la clase
-  static final HttpClientService _httpClientService =
-      HttpClientService._internal();
+  static late HttpClientService _httpClientService;
 
   //+ Getter para la instancia única
   static HttpClientService get httpClientService => _httpClientService;
-
-  /// Realiza una solicitud GET a la URL especificada.
-  ///
-  /// [url] La URL a la que se realizará la solicitud.
-  /// [queryParameters] Parámetros de consulta opcionales para la solicitud.
-  /// [headers] Headers de consulta opcionales para la solicitud.
-  // Future<Response> _get(String url,
-  //     {Map<String, dynamic>? queryParameters,
-  //     Map<String, dynamic>? headers}) async {
-  //   try {
-  //     return await _dio.get(url,
-  //         queryParameters: queryParameters,
-  //         options: Options(
-  //           headers: headers,
-  //         ));
-  //   } catch (e) {
-  //     throw Exception(e);
-  //   }
-  // }
 
   /// Realiza una solicitud GET a la URL especificada.
   ///
@@ -59,8 +74,10 @@ class HttpClientService {
       Map<String, String>? headers}) async {
     try {
       //+ Ejecutamos la request
-      final response = await http.get(Uri.parse(url), headers: headers);
-
+      final response = await client.get(Uri.parse(url), headers: headers);
+      print("response");
+      print(response.body);
+      print("response");
       //+ Parseamos la request
       return GetResponse(body: json.decode(response.body));
     } catch (e) {
@@ -88,21 +105,6 @@ class HttpClientService {
     //+ Parseamos la request
     return PostResponse(body: json.decode(response.body));
   }
-
-  // /// Realiza una solicitud PATCH a la URL especificada con los datos proporcionados.
-  // ///
-  // /// [url] La URL a la que se realizará la solicitud PATCH.
-  // /// [data] Los datos que se enviarán en el cuerpo de la solicitud.
-  // /// [headers] Headers de consulta opcionales para la solicitud.
-  // Future<Response> patch(String url,
-  //     {Map<String, dynamic>? data, Map<String, dynamic>? headers}) async {
-  //   try {
-  //     return await _dio.patch(url,
-  //         data: data, options: Options(headers: headers));
-  //   } catch (e) {
-  //     throw Exception(e);
-  //   }
-  // }
 }
 
 class HttpError extends Error {

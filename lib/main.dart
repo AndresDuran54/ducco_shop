@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ducco_shop/modules/products/module.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ducco_shop/lib_shares/services/http-client.service.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
@@ -15,18 +16,23 @@ void main() {
         create: (BuildContext context) => new CategoryProductsBloc()),
     BlocProvider<CustomerBloc>(
         create: (BuildContext context) => new CustomerBloc()),
-  ], child: const MyApp()));
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    HttpClientService.start(context);
+
     return MaterialApp(
       title: 'Ducco Shop',
       initialRoute: '/auth/info',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       routes: {
         /* 
               FUTURE BUILDER

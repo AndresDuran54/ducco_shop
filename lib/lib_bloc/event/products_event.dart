@@ -53,3 +53,9 @@ class ShoppingCartErrorEvent extends ShoppingCartEvent {
   //+ Constructor
   const ShoppingCartErrorEvent();
 }
+
+//+ Evento para resetear el carrito después de realizar un pedido
+class ShoppingCartRestartEvent extends ShoppingCartEvent {
+  //+ Constructor
+  const ShoppingCartRestartEvent();
+}

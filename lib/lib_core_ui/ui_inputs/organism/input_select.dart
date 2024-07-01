@@ -42,7 +42,6 @@ class CoreUIInputSelect extends StatelessWidget {
           ), // Estilo de la línea cuando no está seleccionado
         ),
       ),
-      isExpanded: true,
       onChanged: (String? value) {
         if (value != null) {
           textEditingController.text = value;

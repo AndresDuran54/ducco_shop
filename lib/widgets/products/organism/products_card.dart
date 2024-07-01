@@ -98,7 +98,8 @@ class ProductCard extends StatelessWidget {
                         height: 30,
                         onPressedFunc: productIndex == -1
                             ? () {
-                                shoppingCartBloc.addProduct(product, 1);
+                                shoppingCartBloc.addProduct(
+                                    product, 1, context);
                               }
                             : null,
                         enabledColor: AppColors.secondary60Color,

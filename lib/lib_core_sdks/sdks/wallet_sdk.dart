@@ -31,7 +31,7 @@ class WalletSDKService {
     //+ ORDERS
     'orders': {'newItem': '${env.MICROS.WALLET.HOST}/v1/orders'},
     //+ PARAMETERS
-    'parameters': {'getItem': '${env.MICROS.WALLET.HOST}/v1/parameters'},
+    'parameters': {'getItem': '${env.MICROS.WALLET.HOST}/v1/parameters/:id'},
   };
 
   //+ PAYMENT METHODS
@@ -60,10 +60,14 @@ class WalletSDKService {
   Future<dynamic> ordersNewItem(
       {Map<String, String>? headers, Map<String, dynamic>? body}) async {
     try {
+      print("response2");
+
       //+ Obtenemos los registro de los productos
       final response = await _httpClientService
           .post('${urls['orders']!['newItem']}', headers: headers, body: body);
 
+      print(response);
+      print("response");
       //+ Construimos la response
       return SDKOrdersNewItem(
         item: response.body['data']['item'],
@@ -78,14 +82,14 @@ class WalletSDKService {
   //+ PARAMETERS
 
   //+ Obtener el registro de un parámetro
-  Future<dynamic> parameterItem(
-      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
+  Future<dynamic> parameterItem(Map<String, dynamic> params,
+      {Map<String, String>? headers}) async {
     try {
       //+ Obtenemos los registro de los productos
-      final response = await _httpClientService.post(
-          '${urls['parameters']!['getItem']}',
-          headers: headers,
-          body: body);
+      final response = await _httpClientService.get(
+          '${urls['parameters']!['getItem']}'
+              .replaceFirst(":id", params["paramId"]),
+          headers: headers);
 
       //+ Construimos la response
       return SDKParametersItem(
